@@ -5,8 +5,6 @@ from app.secure.hash import get_data_hash, compare_data_hash
 from app.models.schemas.wanted import ListOfWantedDataResponse, WantedDataResponse, OptionalListOfWantedDataResponse
 router = APIRouter(prefix = "/wanted", tags = ["wanted"])
 
-
-
 @router.get(
     path = "",
     response_model = ListOfWantedDataResponse,
