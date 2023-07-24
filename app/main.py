@@ -5,6 +5,7 @@ from app.api.endpoint import router
 from app.config.app import get_app_settings
 from app.core.events import create_start_app_handler, create_stop_app_handler
 
+
 def get_application() -> FastAPI:
     # initialize FastAPI and settings
     application = FastAPI()

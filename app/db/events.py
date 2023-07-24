@@ -18,15 +18,19 @@ async def connect_to_db(app: FastAPI, settings: AppSettings) -> None:
     #     min_size=settings.min_connection_count,
     #     max_size=settings.max_connection_count,
     # )
-    engine = create_engine(settings.database_url,
-                           echo = True,
-                           connect_args = {'check_same_thread' : False})
+    engine = create_engine(
+        url=settings.sync_database_url,
+        echo=settings.db_echo_log,
+        connect_args={'check_same_thread' : False}
+    )
+    
     session = sessionmaker(autocommit=True, autoflush=False, bind=engine)
     Base = declarative_base()
 
     logger.info("Connection established")
-
-    return None
+    print("Connection established")
+    
+    return session
 
 
 async def close_db_connection(app: FastAPI) -> None:
