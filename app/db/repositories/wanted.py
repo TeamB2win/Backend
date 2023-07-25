@@ -16,7 +16,7 @@ class Wanted(Base):
     name = Column(TEXT, nullable=True)
     sex = Column(Boolean, nullable=True) # True : Female, False : Male
     age = Column(Integer, nullable=True)
-    wanted_type = Column(bool, nullable=False, default=False) # True : urgent case
+    wanted_type = Column(Boolean, nullable=False, default=False) # True : urgent case
 
     ## relationships
     detail = relationship("WantedDetail", back_populates="_wanted")
