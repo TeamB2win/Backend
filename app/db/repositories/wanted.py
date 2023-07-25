@@ -26,7 +26,7 @@ class Wanted(Base):
 class WantedDetail(Base):
     __tablename__ = "wanted_detail"
 
-    id = Column(Integer, ForeignKey("wanted.id"))
+    id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     height = Column(REAL, nullable = True, default=170)
     weight = Column(String(100), nullable = True, default="왜소한 체격")
     registered_address = Column(String(100), nullable=True)
@@ -43,7 +43,7 @@ class WantedDetail(Base):
 class WantedDataSource(Base) :
     __tablename__ = "wanted_data_source"
 
-    id = Column(Integer, ForeignKey("wanted.id"))
+    id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     image = Column(TEXT, nullable=True)
     video = Column(TEXT, nullable=True)
     generated = Column(Integer, default=0, nullable = False)
