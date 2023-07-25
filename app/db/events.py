@@ -13,7 +13,7 @@ async def connect_to_db(app: FastAPI, settings: AppSettings) -> None:
     global async_session, Base, engine
     #logger.info("Connecting to PostgreSQL")
 
-    engine = create_async_engine(settings.sync_database_url(),
+    engine = create_async_engine(settings.sync_database_url,
                             pool_pre_ping=True,
                             echo = True,
                             )
