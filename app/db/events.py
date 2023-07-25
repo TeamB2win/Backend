@@ -21,7 +21,7 @@ async def connect_to_db(app: FastAPI, settings: AppSettings) -> None:
     async with engine.begin() as conn :
         await conn.run_sync(Base.metadata.create_all)
 
-    async_session = async_sessionmaker(autocommit=True, autoflush=False, expire_on_commit=False, bind=engine)
+    async_session = async_sessionmaker(autoflush=False, expire_on_commit=False, bind=engine)
 
     #logger.info("Connection established")
 
