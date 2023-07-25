@@ -48,4 +48,4 @@ class WantedDataSource(Base) :
     generated = Column(Integer, default=0, nullable = False)
 
     ## relationships
-    _wanted = relationship("Wanted", back_populates="detail", uselist=False)
+    _wanted = relationship("Wanted", back_populates="datasource", uselist=False)
