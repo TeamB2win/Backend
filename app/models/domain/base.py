@@ -15,7 +15,7 @@ def convert_field_to_camel_case(string: str) -> str:
     )
 
 class BaseDomainModel(BaseModel):
-    Config = BaseConfig
+    Config = BaseConfig()
     Config.from_attributes = True
     Config.validate_assignment = True
     Config.allow_population_by_field_name = True
