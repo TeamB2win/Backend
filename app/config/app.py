@@ -4,7 +4,7 @@ from typing import List
 from pydantic import PostgresDsn
 
 class AppSettings() :
-    allowed_host : List[str] = ["*"]
+    allowed_hosts : List[str] = ["*"]
     database_url : PostgresDsn
 
     min_connection_count : int = 10
