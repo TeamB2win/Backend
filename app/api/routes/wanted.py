@@ -16,7 +16,6 @@ async def list_wanted_for_user(
     db_session: AsyncSession = Depends(get_db),
 ) -> ListOfWantedDataResponse :
     data = await get_full_wanted_data(db_session)
-    print(data)
     data_hash = get_data_hash(data)
     return ListOfWantedDataResponse(
         data_hash = data_hash,

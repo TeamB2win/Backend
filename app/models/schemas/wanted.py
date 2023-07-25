@@ -1,15 +1,15 @@
 from typing import Optional, List
-from pydantic import BaseModel
+from app.models.schemas.base import BaseSchemaModel
 from app.models.domain.wanted import WantedData
 
-class WantedDataResponse(BaseModel) :
+class WantedDataResponse(BaseSchemaModel) :
     data_hash : str
     data : List[WantedData]
 
-class ListOfWantedDataResponse(BaseModel) :
+class ListOfWantedDataResponse(BaseSchemaModel) :
     data_hash : str
     data : List[WantedData]
 
-class OptionalListOfWantedDataResponse(BaseModel) :
+class OptionalListOfWantedDataResponse(BaseSchemaModel) :
     data_hash : str
     data : Optional[List[WantedData]]
