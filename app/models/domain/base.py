@@ -12,7 +12,7 @@ def convert_field_to_camel_case(string: str) -> str:
     )
 
 class BaseDomainModel(BaseModel):
-    Config = ConfigDict(
+    model_config = ConfigDict(
         from_attributes = True,
         validate_assignment = True,
         populate_by_name = True,
