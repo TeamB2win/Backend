@@ -1,6 +1,5 @@
 import datetime
-from pydantic import BaseModel
-from app.config.model import BaseConfig
+from pydantic import BaseModel, ConfigDict
 
 # def convert_datetime_to_realworld(dt: datetime.datetime) -> str:
 #     return dt.replace(tzinfo=datetime.timezone.utc).isoformat().replace("+00:00", "Z")
@@ -13,7 +12,7 @@ def convert_field_to_camel_case(string: str) -> str:
     )
 
 class BaseDomainModel(BaseModel):
-    Config = BaseConfig(
+    Config = ConfigDict(
         from_attributes = True,
         validate_assignment = True,
         populate_by_name = True,
