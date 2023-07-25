@@ -5,14 +5,7 @@ from pydantic import BaseModel, HttpUrl
 
 from app.models.domain.base import BaseDomainModel
 
-class WantedData(BaseDomainModel) :
-    id : int
-    wanted_id : int
-    name : Optional[str]
-    sex : bool
-    age : Optional[int]
-    wanted_type : bool
-
+class WantedDetailData(BaseDomainModel) :
     height : Optional[int]
     weight : Optional[str]
     registered_address : Optional[str]
@@ -23,6 +16,18 @@ class WantedData(BaseDomainModel) :
     started_at : datetime
     ended_at : datetime
 
+class WantedSourceData(BaseDomainModel) :
     image : str
     video : Optional[str]
     generated : int
+
+class WantedFullData(BaseDomainModel) :
+    id : int
+    wanted_id : int
+    name : Optional[str]
+    sex : bool
+    age : Optional[int]
+    wanted_type : bool
+
+    detail : WantedDetailData
+    source : WantedSourceData
