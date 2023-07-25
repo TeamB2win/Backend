@@ -11,10 +11,10 @@ from app.db.repositories.base_class import Base
 class Wanted(Base):
     __tablename__ = "wanted"
 
-    id = Column(Integer, Sequence('wanted_id_seq'), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(TEXT, nullable=True)
     sex = Column(Boolean, nullable=True) # True : Female, False : Male
-    age = Column(Integer, nullable=True)
+    age = Column(REAL, nullable=True)
     wanted_type = Column(Boolean, nullable=False, default=False) # True : urgent case
 
     ## relationships
@@ -24,9 +24,6 @@ class Wanted(Base):
 
 class WantedDetail(Base):
     __tablename__ = "wanted_detail"
-
-    ## unused primary key. It is created for ORM object mapping
-    #_wanted_detail_id = Column(Integer, Sequence('wanted_detail_id_seq'), primary_key=True)
 
     id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     height = Column(REAL, nullable = True, default=170)
@@ -44,9 +41,6 @@ class WantedDetail(Base):
 
 class WantedDataSource(Base) :
     __tablename__ = "wanted_data_source"
-
-    ## unused primary key. It is created for ORM object mapping
-    # _wanted_datasource_id = Column(Integer, Sequence('wanted_datasource_id_seq'), primary_key=True)
 
     id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     image = Column(TEXT, nullable=True)

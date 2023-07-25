@@ -7,7 +7,7 @@ from app.db.repositories.base_class import Base
 class Admin(Base):
     __tablename__ = "admin"
 
-    id = Column(Integer, Sequence('admin_id_seq'), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     admin_id = Column(VARCHAR, nullable=False)
     password = Column(VARCHAR, nullable=False)
     age = Column(Integer, nullable=True)
@@ -18,9 +18,6 @@ class Admin(Base):
 
 class AdminDetail(Base):
     __tablename__ = "admin_detail"
-
-    ## unused primary key. It is created for ORM object mapping
-    # _admin_detail_id = Column(Integer, Sequence('admin_detail_id_seq'), primary_key=True)
 
     id = Column(Integer, ForeignKey("admin.id"), primary_key=True)
     name = Column(VARCHAR, nullable=True)
@@ -33,9 +30,6 @@ class AdminDetail(Base):
 
 class Requester(Base) :
     __tablename__ = "requester"
-
-    ## unused primary key. It is created for ORM object mapping
-    # _requester_id = Column(Integer, Sequence('admin_requester_id_seq'), primary_key=True)
 
     id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     admin_id = Column(Integer, ForeignKey("admin.id"))
