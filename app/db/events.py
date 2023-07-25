@@ -32,7 +32,7 @@ async def close_db_connection(app: FastAPI) -> None:
     global engine
     #logger.info("Closing connection to database")
 
-    engine.dispose()
+    await engine.dispose()
 
     #logger.info("Connection closed")
 

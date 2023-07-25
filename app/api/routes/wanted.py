@@ -15,7 +15,7 @@ router = APIRouter(prefix = "/wanted", tags = ["wanted"])
 async def list_wanted_for_user(
     db_session: AsyncSession = Depends(get_db),
 ) -> ListOfWantedDataResponse :
-    data = get_full_wanted_data(db_session)
+    data = await get_full_wanted_data(db_session)
     data_hash = get_data_hash(data)
     return ListOfWantedDataResponse(
         data_hash = data_hash,
@@ -31,7 +31,7 @@ async def individual_wanted_for_user(
     id : int,
     db_session: AsyncSession = Depends(get_db),
 ) -> WantedDataResponse :
-    data = get_wanted_data(db_session, id)
+    data = await get_wanted_data(db_session, id)
     data_hash = get_data_hash(data)
     return WantedDataResponse(
         data_hash = data_hash,
@@ -47,7 +47,7 @@ async def check_wanted_list(
     data_hash : str,
     db_session: AsyncSession = Depends(get_db),
 ) -> OptionalListOfWantedDataResponse :
-    wanted_datalist = get_full_wanted_data(db_session)
+    wanted_datalist = await get_full_wanted_data(db_session)
     orig_data_hash = get_data_hash(wanted_datalist)
 
     response = OptionalListOfWantedDataResponse(
