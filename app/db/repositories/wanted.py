@@ -5,7 +5,6 @@ from sqlalchemy import (
     TIMESTAMP
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 
 from app.db.repositories.base_class import Base
 
