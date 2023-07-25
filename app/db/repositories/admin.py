@@ -19,7 +19,7 @@ class Admin(Base):
 class AdminDetail(Base):
     __tablename__ = "admin_detail"
 
-    id = Column(Integer, ForeignKey("admin.id"), primary_key=True)
+    id = Column(Integer, ForeignKey("admin.id"))
     name = Column(VARCHAR, nullable=True)
     position = Column(VARCHAR, nullable=True)
     work_place = Column(VARCHAR, nullable=True)
@@ -31,7 +31,7 @@ class AdminDetail(Base):
 class Requester(Base) :
     __tablename__ = "requester"
 
-    id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
+    id = Column(Integer, ForeignKey("wanted.id"))
     admin_id = Column(Integer, ForeignKey("admin.id"))
     requester = Column(VARCHAR)
     name = Column(VARCHAR)
