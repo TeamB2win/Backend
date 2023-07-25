@@ -26,9 +26,9 @@ class WantedDetail(Base):
     __tablename__ = "wanted_detail"
 
     ## unused primary key. It is created for ORM object mapping
-    _wanted_detail_id = Column(Integer, Sequence('wanted_detail_id_seq'), primary_key=True)
+    #_wanted_detail_id = Column(Integer, Sequence('wanted_detail_id_seq'), primary_key=True)
 
-    id = Column(Integer, ForeignKey("wanted.id"))
+    id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     height = Column(REAL, nullable = True, default=170)
     weight = Column(String(100), nullable = True, default="왜소한 체격")
     registered_address = Column(String(100), nullable=True)
@@ -46,9 +46,9 @@ class WantedDataSource(Base) :
     __tablename__ = "wanted_data_source"
 
     ## unused primary key. It is created for ORM object mapping
-    _wanted_datasource_id = Column(Integer, Sequence('wanted_datasource_id_seq'), primary_key=True)
+    # _wanted_datasource_id = Column(Integer, Sequence('wanted_datasource_id_seq'), primary_key=True)
 
-    id = Column(Integer, ForeignKey("wanted.id"))
+    id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     image = Column(TEXT, nullable=True)
     video = Column(TEXT, nullable=True)
     generated = Column(Integer, default=0, nullable = False)

@@ -8,7 +8,7 @@ class Admin(Base):
     __tablename__ = "admin"
 
     id = Column(Integer, Sequence('admin_id_seq'), primary_key=True)
-    admin_id = Column(VARCHAR, nullable=False, primary_key=True)
+    admin_id = Column(VARCHAR, nullable=False)
     password = Column(VARCHAR, nullable=False)
     age = Column(Integer, nullable=True)
 
@@ -20,9 +20,9 @@ class AdminDetail(Base):
     __tablename__ = "admin_detail"
 
     ## unused primary key. It is created for ORM object mapping
-    _admin_detail_id = Column(Integer, Sequence('admin_detail_id_seq'), primary_key=True)
+    # _admin_detail_id = Column(Integer, Sequence('admin_detail_id_seq'), primary_key=True)
 
-    id = Column(Integer, ForeignKey("admin.id"))
+    id = Column(Integer, ForeignKey("admin.id"), primary_key=True)
     name = Column(VARCHAR, nullable=True)
     position = Column(VARCHAR, nullable=True)
     work_place = Column(VARCHAR, nullable=True)
@@ -35,9 +35,9 @@ class Requester(Base) :
     __tablename__ = "requester"
 
     ## unused primary key. It is created for ORM object mapping
-    _requester_id = Column(Integer, Sequence('admin_requester_id_seq'), primary_key=True)
+    # _requester_id = Column(Integer, Sequence('admin_requester_id_seq'), primary_key=True)
 
-    id = Column(Integer, ForeignKey("wanted.id"))
+    id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     admin_id = Column(Integer, ForeignKey("admin.id"))
     requester = Column(VARCHAR)
     name = Column(VARCHAR)
