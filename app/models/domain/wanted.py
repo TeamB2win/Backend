@@ -30,4 +30,4 @@ class WantedFullData(BaseDomainModel) :
     wanted_type : bool
 
     detail : List[WantedDetailData]
-    source : List[WantedSourceData]
+    datasource : List[WantedSourceData]
