@@ -9,13 +9,13 @@ async def get_full_wanted_data(db: AsyncSession) -> List[Wanted]:
             .options(joinedload(Wanted.detail, innerjoin=True)) \
             .options(joinedload(Wanted.datasource, innerjoin=True))
     
-    result = await db.execute(query).unique()
-    return result.scalars().all()
+    result = await db.execute(query)
+    return result.unique().scalars().all()
 
 async def get_wanted_data(db: AsyncSession, id : int) -> List[Wanted]:
     query = select(Wanted) \
             .options(joinedload(Wanted.detail, innerjoin=True)) \
             .options(joinedload(Wanted.datasource, innerjoin=True)) \
             .filter(Wanted.id == id)
-    result = await db.execute(query).unique()
-    return result.scalars().all()
+    result = await db.execute(query)
+    return result.unique().scalars().all()
