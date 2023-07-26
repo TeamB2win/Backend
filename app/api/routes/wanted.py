@@ -60,7 +60,9 @@ async def check_wanted_list(
         )
     if not compare_data_hash(orig_data_hash, data_hash) :
         response.data = wanted_datalist
+        response.status = 'NEW_DATA'
     else :
         response.data = [ WantedFullData() ]
+        response.status = 'OK'
 
     return response
