@@ -12,4 +12,4 @@ class ListOfWantedDataResponse(BaseSchemaModel) :
 
 class OptionalListOfWantedDataResponse(BaseSchemaModel) :
     data_hash : str
-    data : Optional[List[WantedFullData]]
+    data : Optional[List[WantedFullData]] = None
