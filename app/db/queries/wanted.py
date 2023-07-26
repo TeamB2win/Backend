@@ -9,7 +9,7 @@ async def get_full_wanted_data(db: AsyncSession) -> List[Wanted]:
             .options(joinedload(Wanted.detail, innerjoin=True)) \
             .options(joinedload(Wanted.datasource, innerjoin=True))
     
-    result = await db.execute(query)
+    result = await db.execute(query).unique()
     return result.scalars().all()
 
 async def get_wanted_data(db: AsyncSession, id : int) -> List[Wanted]:
@@ -17,5 +17,5 @@ async def get_wanted_data(db: AsyncSession, id : int) -> List[Wanted]:
             .options(joinedload(Wanted.detail, innerjoin=True)) \
             .options(joinedload(Wanted.datasource, innerjoin=True)) \
             .filter(Wanted.id == id)
-    result = await db.execute(query)
+    result = await db.execute(query).unique()
     return result.scalars().all()
