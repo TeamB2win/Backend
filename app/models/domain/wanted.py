@@ -29,5 +29,5 @@ class WantedFullData(BaseDomainModel) :
     age : Optional[int]
     wanted_type : bool
 
-    detail : WantedDetailData
-    source : WantedSourceData
+    detail : List[WantedDetailData]
+    source : List[WantedSourceData]
