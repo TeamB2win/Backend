@@ -21,3 +21,4 @@ class BaseDomainModel(BaseModel):
     Config.allow_population_by_field_name = True
     Config.json_encoders = {datetime.datetime: convert_datetime_to_realworld}
     Config.alias_generator = convert_field_to_camel_case
+
