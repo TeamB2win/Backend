@@ -11,7 +11,7 @@ def convert_field_to_camel_case(string: str) -> str:
         for index, word in enumerate(string.split("_"))
     )
 
-class BaseDomainModel(BaseModel):
+class BaseSchemaModel(BaseModel):
     model_config = ConfigDict(
         from_attributes = True,
         validate_assignment = True,

@@ -1,43 +1,44 @@
-import asyncpg
-from databases import Database
-
 from fastapi import FastAPI
-from loguru import logger
-from sqlalchemy import (Column, Integer, String, Table, create_engine, MetaData)
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import declarative_base
+
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.app import AppSettings
+from app.db.repositories.base import Base
 
+engine = None
+async_session = None
 
 async def connect_to_db(app: FastAPI, settings: AppSettings) -> None:
-    logger.info("Connecting to PostgreSQL")
+    global async_session, Base, engine
+    #logger.info("Connecting to PostgreSQL")
 
-    # app.state.pool = await asyncpg.create_pool(
-    #     str(settings.database_url),
-    #     min_size=settings.min_connection_count,
-    #     max_size=settings.max_connection_count,
-    # )
-    engine = create_engine(
-        url=settings.sync_database_url,
-        echo=settings.db_echo_log,
-        connect_args={'check_same_thread' : False}
-    )
-    
-    session = sessionmaker(autocommit=True, autoflush=False, bind=engine)
-    Base = declarative_base()
+    engine = create_async_engine(settings.sync_database_url,
+                            pool_pre_ping=True,
+                            echo = True,
+                            )
 
-    logger.info("Connection established")
-    print("Connection established")
-    
-    return session
+    async with engine.begin() as conn :
+        await conn.run_sync(Base.metadata.create_all)
+
+    async_session = async_sessionmaker(autoflush=False, expire_on_commit=False, bind=engine)
+
+    #logger.info("Connection established")
+
+    return None
 
 
 async def close_db_connection(app: FastAPI) -> None:
-    logger.info("Closing connection to database")
+    global engine
+    #logger.info("Closing connection to database")
 
-    await app.state.pool.close()
+    await engine.dispose()
 
-    logger.info("Connection closed")
+    #logger.info("Connection closed")
 
     return None
+
+async def get_db() -> AsyncSession:
+    global async_session
+    async with async_session() as session:
+        yield session

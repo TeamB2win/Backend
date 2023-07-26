@@ -4,7 +4,7 @@ from typing import List
 from pydantic import PostgresDsn
 
 class AppSettings() :
-    allowed_host : List[str] = ["*"]
+    allowed_hosts : List[str] = ["*"]
     database_url : PostgresDsn
 
     min_connection_count : int = 10
@@ -19,7 +19,7 @@ class AppSettings() :
     
     @property
     def sync_database_url(self) -> str:
-        return f"postgresql://{self.postgres_user}:{self.postgres_password}@{self.postgres_server}:{self.postgres_port}/{self.postgres_db}"
+        return f"postgresql+asyncpg://{self.postgres_user}:{self.postgres_password}@{self.postgres_server}:{self.postgres_port}/{self.postgres_db}"
     
 
 @lru_cache
