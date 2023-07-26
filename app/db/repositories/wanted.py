@@ -12,6 +12,7 @@ class Wanted(Base):
     __tablename__ = "wanted"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    wanted_id = Column(Integer, nullable=True)
     name = Column(TEXT, nullable=True)
     sex = Column(Boolean, nullable=True) # True : Female, False : Male
     age = Column(REAL, nullable=True)
