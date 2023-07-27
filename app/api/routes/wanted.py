@@ -52,7 +52,7 @@ async def individual_wanted_for_user(
 
     return WantedDataResponse(
         data_hash = data_hash,
-        data = data
+        data = [ data ]
     )
 
 @router.get(
