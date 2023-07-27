@@ -15,6 +15,7 @@ def to_hash(
 def to_str(
     data         
 ) -> str:
+    print(data)
     data_str = ""
 
     if isinstance(data, list) :
