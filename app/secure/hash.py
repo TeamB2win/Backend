@@ -1,5 +1,8 @@
 from collections import OrderedDict
+from typing import List
 import hashlib 
+
+from datetime import datetime
 
 wanted_data_hash = ""
 
@@ -13,12 +16,18 @@ def to_str(
     data         
 ) -> str:
     data_str = ""
-    data_dict = data.__dict__  # 객체의 멤버변수를 딕셔너리로 변환
-    sorted_dict = OrderedDict(sorted(data_dict.items(), key=lambda x: x[0]))
-    for key, value in sorted_dict.items():
-        if not isinstance(value, (int, str, list, tuple, dict, set, float, bool)) and isinstance(value, object):
+
+    if isinstance(data, list) :
+        for _data in sorted(data) :
+            data_str += to_str(_data)
+        data_str = data_str.encode('utf-8')
+        
+    else :
+        data_dict = data.__dict__  # 객체의 멤버변수를 딕셔너리로 변환
+        sorted_dict = OrderedDict(sorted(data_dict.items(), key=lambda x: x[0]))
+        for key, value in sorted_dict.items():
             sorted_dict[key] = to_str(value)
-    data_str = str(sorted_dict).encode('utf-8')
+        data_str = str(sorted_dict).encode('utf-8')
     return data_str
 
 def calculate_hash(
