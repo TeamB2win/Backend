@@ -8,6 +8,9 @@ from sqlalchemy.orm import relationship
 
 from app.db.repositories.base_class import Base
 
+from dataclasses import dataclass
+
+@dataclass
 class Wanted(Base):
     __tablename__ = "wanted"
 
@@ -22,7 +25,10 @@ class Wanted(Base):
     detail = relationship("WantedDetail", back_populates="_wanted")
     datasource = relationship("WantedDataSource", back_populates="_wanted")
     requester = relationship("Requester", back_populates="_wanted")
-
+    
+    
+    
+@dataclass
 class WantedDetail(Base):
     __tablename__ = "wanted_detail"
 
@@ -39,7 +45,10 @@ class WantedDetail(Base):
 
     ## relationships
     _wanted = relationship("Wanted", back_populates="detail", uselist=False)
-
+    
+    
+    
+@dataclass
 class WantedDataSource(Base) :
     __tablename__ = "wanted_data_source"
 
