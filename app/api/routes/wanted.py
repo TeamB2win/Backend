@@ -7,7 +7,7 @@ from app.db.queries.wanted import get_full_wanted_data, get_wanted_data
 from app.secure.hash import get_data_hash, compare_data_hash
 from app.models.domain.wanted import WantedFullData
 from app.models.schemas.wanted import (
-    ListOfWantedDataResponse, WantedDataResponse, OptionalListOfWantedDataResponse
+    ListOfWantedDataResponse, WantedDataResponse, CheckHashResponse
 )
 from app.resources import strings
 
@@ -56,23 +56,20 @@ async def individual_wanted_for_user(
 
 @router.get(
     path = "/check/{data_hash}",
-    response_model = OptionalListOfWantedDataResponse,
+    response_model = CheckHashResponse,
     status_code = status.HTTP_200_OK,
     name = "wanted:check-wanted-list",    
 )
 async def check_wanted_list(
     data_hash : str = Path(title="The data hash of all wanted data to validate"),
-    db_session: AsyncSession = Depends(get_db),
-) -> OptionalListOfWantedDataResponse :
-    wanted_datalist = await get_full_wanted_data(db_session)
-    orig_data_hash = get_data_hash(wanted_datalist)
+) -> CheckHashResponse :
+    orig_data_hash = get_data_hash(None)
 
-    response = OptionalListOfWantedDataResponse(
+    response = CheckHashResponse(
             data_hash = orig_data_hash
         )
     if not compare_data_hash(orig_data_hash, data_hash) :
-        response.data = wanted_datalist
-        response.status = 'NEW_DATA'
+        response.status = 'Expired'
     else :
         response.status = 'OK'
 

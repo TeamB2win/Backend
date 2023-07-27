@@ -11,12 +11,11 @@ class ListOfWantedDataResponse(BaseSchemaModel) :
     data_hash : str
     data : List[WantedFullData]
 
-class OptionalListOfWantedDataResponse(BaseSchemaModel) :
+class CheckHashResponse(BaseSchemaModel) :
     data_hash : str
     status : str = Field(default = 'OK')
-    data : Optional[List[WantedFullData]] = None
 
     @validator('status')
     def status_check(cls, v) :
-        assert v in ['OK', 'NEW_DATA'], ValueError('Invaild Status')
+        assert v in ['OK', 'Expired'], ValueError('Invaild Status')
         return v
