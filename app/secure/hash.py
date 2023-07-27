@@ -1,10 +1,23 @@
-def get_data_hash(
-    data,
-) -> str :
-    return "1"
 
-def compare_data_hash(
-    orig_data_hash : str,
-    target_data_hash : str
+hash_dict = {
+    "data" : "1",
+    "dl_server" : "1"
+}
+
+
+def update_hash(
+    data,
+    hash_type : str = "data"
+) -> None :
+    return None
+
+def get_hash(
+    hash_type : str = "data"
+) -> str :
+    return hash_dict[hash_type]
+
+def compare_hash(
+    cur_hash : str,
+    hash_type : str = "data"
 ) -> bool :
-    return orig_data_hash == target_data_hash
+    return cur_hash == hash_dict[hash_type]
