@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import hashlib 
 
+wanted_data_hash = ""
 
 def to_hash(
     data
@@ -23,15 +24,15 @@ def to_str(
 def calculate_hash(
     data
 ) -> str:
-    return to_hash(to_str(data))
+    global wanted_data_hash
+
+    wanted_data_hash = to_hash(to_str(data))
+    return wanted_data_hash
     
-def get_data_hash(
-    data,
-) -> str :
-    return ""
+def get_data_hash() -> str :
+    return wanted_data_hash
 
 def compare_data_hash(
-    orig_data_hash : str,
-    target_data_hash : str
+    required_data_hash : str,
 ) -> bool :
-    return orig_data_hash==target_data_hash
+    return required_data_hash==wanted_data_hash
