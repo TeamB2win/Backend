@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.errors.http_errors import HTTP_Exception
 from app.db.events import get_db
 from app.db.queries.wanted import get_full_wanted_data, get_wanted_data
-from app.secure.hash import get_hash, compare_hash
-from app.models.domain.wanted import WantedFullData
+from app.secure.hash import calculate_hash, compare_data_hash
+
 from app.models.schemas.wanted import (
     ListOfWantedDataResponse, WantedDataResponse, CheckHashResponse
 )
@@ -28,9 +28,7 @@ async def list_wanted_for_user(
     db_session: AsyncSession = Depends(get_db),
 ) -> ListOfWantedDataResponse :
     data = await get_full_wanted_data(db_session)
-    data_hash = get_hash(
-        hash_type = "data"
-    )
+    data_hash = calculate_hash( data )
     return ListOfWantedDataResponse(
         data_hash = data_hash,
         data = data
@@ -50,9 +48,8 @@ async def individual_wanted_for_user(
     data = await get_wanted_data(db_session, id)
     if not data :
         raise HttpError404.error_raise()
-    data_hash = get_hash(
-        hash_type = 'data'
-    )
+    data_hash = calculate_hash( data )
+
     return WantedDataResponse(
         data_hash = data_hash,
         data = data
@@ -65,14 +62,13 @@ async def individual_wanted_for_user(
     name = "wanted:check-wanted-list",    
 )
 async def check_wanted_list(
-    data_hash : str = Path(title="The data hash of all wanted data to validate"),
+    old_data_hash : str = Path(title="The data hash of all wanted data to validate"),
 ) -> CheckHashResponse :
     response = CheckHashResponse(
-            data_hash = data_hash
+            data_hash = old_data_hash
         )
-    if not compare_hash( 
-        cur_hash = data_hash,
-        hash_type = 'data'
+    if not compare_data_hash( 
+        required_data_hash = old_data_hash,
     ) :
         response.status = 'Expired'
     else :
