@@ -19,8 +19,11 @@ def to_str(
     data_str = ""
 
     if isinstance(data, list) :
-        for _data in sorted(data) :
-            data_str += to_str(_data)
+        result_str = list()
+        for _data in data :
+            result_str.append(to_str(_data))
+        result_str.sort()
+        data_str = str(result_str)
         
     else :
         data_dict = data.__dict__  # 객체의 멤버변수를 딕셔너리로 변환

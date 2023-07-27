@@ -45,7 +45,7 @@ DataFileNotFoundError = HTTP_Exception(
                  **VideoPathExistException.responses, 
                  **DataFileNotFoundError.responses
                  },
-    status_code = status.HTTP_200_OK,
+    status_code = status.HTTP_201_CREATED,
     name = "dl:register-video-path",
 )
 async def register_video_path(
@@ -74,7 +74,7 @@ async def register_video_path(
                  **VideoPathNotExistException.responses, 
                  **DataFileNotFoundError.responses
                  },
-    status_code = status.HTTP_200_OK,
+    status_code = status.HTTP_201_CREATED,
     name = "dl:change-video-source",
 )
 async def change_video_source(
