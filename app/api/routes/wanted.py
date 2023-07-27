@@ -5,6 +5,7 @@ from app.api.errors.http_errors import HTTP_Exception
 from app.db.events import get_db
 from app.db.queries.wanted import get_full_wanted_data, get_wanted_data
 from app.secure.hash import get_hash, compare_hash
+from app.models.domain.wanted import WantedFullData
 from app.models.schemas.wanted import (
     ListOfWantedDataResponse, WantedDataResponse, CheckHashResponse
 )
