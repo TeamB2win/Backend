@@ -62,13 +62,13 @@ async def individual_wanted_for_user(
     name = "wanted:check-wanted-list",    
 )
 async def check_wanted_list(
-    old_data_hash : str = Path(title="The data hash of all wanted data to validate"),
+    data_hash : str = Path(title="The data hash of all wanted data to validate"),
 ) -> CheckHashResponse :
     response = CheckHashResponse(
-            data_hash = old_data_hash
+            data_hash = data_hash
         )
     if not compare_data_hash( 
-        required_data_hash = old_data_hash,
+        required_data_hash = data_hash,
     ) :
         response.status = 'Expired'
     else :
