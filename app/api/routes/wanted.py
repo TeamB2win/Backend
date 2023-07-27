@@ -1,13 +1,22 @@
-from fastapi import APIRouter, HTTPException, Depends, Path, status
+from fastapi import APIRouter, Depends, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.errors.http_errors import HTTP_Exception
 from app.db.events import get_db
 from app.db.queries.wanted import get_full_wanted_data, get_wanted_data
 from app.secure.hash import get_data_hash, compare_data_hash
 from app.models.domain.wanted import WantedFullData
-from app.models.schemas.wanted import ListOfWantedDataResponse, WantedDataResponse, OptionalListOfWantedDataResponse
+from app.models.schemas.wanted import (
+    ListOfWantedDataResponse, WantedDataResponse, OptionalListOfWantedDataResponse
+)
+from app.resources import strings
 
 router = APIRouter(prefix = "/wanted", tags = ["wanted"])
+HttpError404 = HTTP_Exception(
+    status_code = status.HTTP_404_NOT_FOUND,
+    description = strings.DSCRIPTION_404_ERROR,
+    detail = strings.DATA_NOT_FOUND
+)
 
 @router.get(
     path = "",
@@ -28,6 +37,7 @@ async def list_wanted_for_user(
 @router.get(
     path = "/{id}",
     response_model = WantedDataResponse,
+    responses = { **HttpError404.responses },
     status_code = status.HTTP_200_OK,
     name = "wanted:get-individual-wanted",
 )
@@ -36,6 +46,8 @@ async def individual_wanted_for_user(
     db_session: AsyncSession = Depends(get_db),
 ) -> WantedDataResponse :
     data = await get_wanted_data(db_session, id)
+    if not data :
+        raise HttpError404.error_raise()
     data_hash = get_data_hash(data)
     return WantedDataResponse(
         data_hash = data_hash,
@@ -62,7 +74,6 @@ async def check_wanted_list(
         response.data = wanted_datalist
         response.status = 'NEW_DATA'
     else :
-        response.data = [ WantedFullData() ]
         response.status = 'OK'
 
     return response
