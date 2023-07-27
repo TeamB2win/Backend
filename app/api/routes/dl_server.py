@@ -10,12 +10,12 @@ from app.db.events import get_db
 from app.db.queries.wanted import video_id_exist, video_path_exist, inject_video_path
 from app.resources import strings
 
-router = APIRouter(prefix = "/dlserver", tags = ["dlserver"])
+router = APIRouter(prefix = "/dl", tags = ["dl"])
 api_key_header = APIKeyHeader(name="Token")
 
 InvalidIdException = HTTP_Exception(
-    status_code = status.HTTP_400_BAD_REQUEST,
-    description = strings.DSCRIPTION_400_ERROR,
+    status_code = status.HTTP_404_NOT_FOUND,
+    description = strings.DSCRIPTION_404_ERROR,
     detail = strings.ID_NOT_FOUD
 )
 
@@ -42,13 +42,42 @@ DataFileNotFoundError = HTTP_Exception(
     path = "",
     response_model = VideoPathResponse,
     responses = { **InvalidIdException.responses, 
+                 **VideoPathExistException.responses, 
+                 **DataFileNotFoundError.responses
+                 },
+    status_code = status.HTTP_200_OK,
+    name = "dl:register-video-path",
+)
+async def register_video_path(
+    db_session : AsyncSession = Depends(get_db),
+    video_request : VideoPathRequest = Body(..., embed = True),
+) -> VideoPathResponse :
+    if not await video_id_exist(db_session, video_request.id) :
+        InvalidIdException.error_raise()
+    if await video_path_exist(db_session, video_request.id) :
+        VideoPathExistException.error_raise()
+    if not os.path.exists(video_request.video) :
+        DataFileNotFoundError.error_raise()
+    
+    await inject_video_path(db_session, video_request)
+
+    return VideoPathResponse(
+        id = video_request.id,
+        video = video_request.video,
+        checksum = 'OK'
+    )
+
+@router.put(
+    path = "",
+    response_model = VideoPathResponse,
+    responses = { **InvalidIdException.responses, 
                  **VideoPathNotExistException.responses, 
                  **DataFileNotFoundError.responses
                  },
     status_code = status.HTTP_200_OK,
-    name = "dlserver:register-video-path",
+    name = "dl:change-video-source",
 )
-async def register_video_path(
+async def change_video_source(
     db_session : AsyncSession = Depends(get_db),
     video_request : VideoPathRequest = Body(..., embed = True),
 ) -> VideoPathResponse :
@@ -62,29 +91,7 @@ async def register_video_path(
     await inject_video_path(db_session, video_request)
 
     return VideoPathResponse(
-        **video_request,
+        id = video_request.id,
+        video = video_request.video,
         checksum = 'OK'
     )
-
-@router.put(
-    path = "",
-    response_model = VideoPathResponse,
-    responses = { **InvalidIdException.responses, 
-                 **VideoPathExistException.responses, 
-                 **DataFileNotFoundError.responses
-                 },
-    status_code = status.HTTP_200_OK,
-    name = "dlserver:change-video-source",
-)
-async def change_video_source(
-    db_session : AsyncSession = Depends(get_db),
-    video_request : VideoPathRequest = Body(..., embed = True),
-) -> VideoPathResponse :
-    if not await video_id_exist(db_session, video_request.id) :
-        InvalidIdException.error_raise()
-    if await video_path_exist(db_session, video_request.id) :
-        VideoPathExistException.error_raise()
-    if not os.path.exists(video_request.video) :
-        DataFileNotFoundError.error_raise()
-    
-    await inject_video_path(db_session, video_request)
