@@ -10,7 +10,7 @@ def get_application() -> FastAPI:
     # initialize FastAPI and settings
     application = FastAPI()
     settings = get_app_settings()
-
+    
     # setting midware for cross-domain situation (react.js, For example)
 
     application.add_middleware(

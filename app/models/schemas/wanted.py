@@ -19,3 +19,17 @@ class CheckHashResponse(BaseSchemaModel) :
     def status_check(cls, v) :
         assert v in ['OK', 'Expired'], ValueError('Invaild Status')
         return v
+    
+class VideoPathRequest(BaseSchemaModel) :
+    id : int
+    video : str
+
+class VideoPathResponse(BaseSchemaModel) :
+    id : int
+    video : str
+    checksum : str = Field(default = 'OK')
+
+    @validator('checksum')
+    def status_check(cls, v) :
+        assert v in ['OK', 'INVALID'], ValueError('Invaild Status')
+        return v
