@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.errors.http_errors import HTTP_Exception
 from app.db.events import get_db
 from app.db.queries.wanted import get_full_wanted_data, get_wanted_data
-from app.secure.hash import calculate_hash, compare_data_hash
+from app.secure.hash import calculate_hash, get_data_hash, compare_data_hash
 
 from app.models.schemas.wanted import (
     ListOfWantedDataResponse, WantedDataResponse, CheckHashResponse
@@ -48,7 +48,7 @@ async def individual_wanted_for_user(
     data = await get_wanted_data(db_session, id)
     if not data :
         raise HttpError404.error_raise()
-    data_hash = calculate_hash( data )
+    data_hash = get_data_hash()
 
     return WantedDataResponse(
         data_hash = data_hash,
