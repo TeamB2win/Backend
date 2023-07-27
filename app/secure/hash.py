@@ -9,19 +9,19 @@ wanted_data_hash = ""
 def to_hash(
     data
 ) -> dict:
+    print(data)
     hash_object = hashlib.sha256(data.encode('utf-8'))
+
     return hash_object.hexdigest()
 
 def to_str(
     data         
 ) -> str:
-    print(data)
     data_str = ""
 
     if isinstance(data, list) :
         for _data in sorted(data) :
             data_str += to_str(_data)
-        data_str = data_str
         
     else :
         data_dict = data.__dict__  # 객체의 멤버변수를 딕셔너리로 변환
