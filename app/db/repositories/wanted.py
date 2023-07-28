@@ -68,10 +68,10 @@ class WantedDetail(Base):
             registered_address = request.registered_address,
             residence = request.residence,
             criminal = request.criminal,
-            relational_link = str(request.relational_link),
+            relational_link = str(request.relational_link,
             characteristic = request.characteristic,
-            started_at = datetime.timestamp(request.started_at),
-            ended_at = datetime.timestamp(request.ended_at)
+            started_at = request.started_at,
+            ended_at = request.ended_at
         )
     
 @dataclass
