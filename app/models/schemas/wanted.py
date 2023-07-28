@@ -23,8 +23,8 @@ class CheckHashResponse(BaseSchemaModel) :
     
 class VideoPathRequest(BaseSchemaModel) :
     id : int
-    video : str
-    video_source : str
+    video : Optional[str]
+    video_source : Optional[str]
 
     is_err : bool = Field(default = False)
     err_msg : Optional[str] = Field(default = '')
