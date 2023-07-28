@@ -13,19 +13,19 @@ from typing import List
 
 
 # 데이터 추가
-@router.post("/app", status_code=201)
+@router.post("", status_code=201)
 def create_data(
     request : CreateWantedDataRequest = Body(..., embed = True),
     db_session: AsyncSession = Depends(get_db),
 ) -> CreateWantedDataResponse:
     wanted_data: Wanted = Wanted.create(request=request)
-    wanted_data: Wanted = create_wanted_data(db=db_session, wanted_data=wanted_data)
+    wanted_data: Wanted = create_wanted_data(db=db_session, data_table=wanted_data)
 
     wanted_detail_data : WantedDetail = WantedDetail.create(request=request, id = wanted_data.id)
-    wanted_detail_data : WantedDetail = create_wanted_data(db=db_session, wanted_data=wanted_detail_data)
+    wanted_detail_data : WantedDetail = create_wanted_data(db=db_session, data_table=wanted_detail_data)
 
     wanted_datasource_data : WantedDataSource = WantedDataSource.create(request=request, id = wanted_data.id)
-    wanted_datasource_data : WantedDataSource = create_wanted_data(db=db_session, wanted_data=wanted_datasource_data)
+    wanted_datasource_data : WantedDataSource = create_wanted_data(db=db_session, data_table=wanted_datasource_data)
 
     return CreateWantedDataResponse(
         status = 'OK'
