@@ -20,8 +20,8 @@ class WantedSourceData(BaseDomainModel) :
     image : str
     video : Optional[str]
     generated : int
-    driving_video : Optional[str] = Field(default = None)
-    error_msg : Optional[str] = Field(default = None)
+    driving_video : Optional[str] = None
+    error_msg : Optional[str] = None
     
 class WantedFullData(BaseDomainModel) :
     id : int
