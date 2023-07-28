@@ -86,6 +86,7 @@ class WantedDataSource(Base) :
     ## relationships
     _wanted = relationship("Wanted", back_populates="datasource", uselist=False)
 
+    @classmethod
     def create(cls, id: int, request: CreateWantedDataRequest) -> "WantedDataSource":
         return cls(
             id = id,
