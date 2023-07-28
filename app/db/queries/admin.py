@@ -7,9 +7,9 @@ from app.db.repositories.wanted import Wanted, WantedDataSource, WantedDetail
 
 # 범죄자 데이터 추가
 async def create_wanted_data(db : AsyncSession, data_table: Base) -> Base:
-    db.add(instance=data_table) # session object에 저장
-    db.commit() # 데이터베이스에 저장
-    db.refresh(instance=data_table) # 데이터베이스에서 다시 읽기
+    await db.add(instance=data_table) # session object에 저장
+    await db.commit()# 데이터베이스에 저장
+    await db.refresh(instance=data_table) # 데이터베이스에서 다시 읽기
     return data_table
 
 # 범죄자 데이터 수정
