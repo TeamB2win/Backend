@@ -37,7 +37,6 @@ DataFileNotFoundError = HTTP_Exception(
     detail = strings.INVAILD_FILE
 )
 
-
 @router.post(
     path = "",
     response_model = VideoPathResponse,
@@ -52,13 +51,15 @@ async def register_video_path(
     db_session : AsyncSession = Depends(get_db),
     video_request : VideoPathRequest = Body(..., embed = True),
 ) -> VideoPathResponse :
-    if not await video_id_exist(db_session, video_request.id) :
-        InvalidIdException.error_raise()
-    if await video_path_exist(db_session, video_request.id) :
-        VideoPathExistException.error_raise()
-    if not os.path.exists(video_request.video) :
-        DataFileNotFoundError.error_raise()
-    
+    if not video_request.is_err :
+        if not await video_id_exist(db_session, video_request.id) :
+            InvalidIdException.error_raise()
+        if await video_path_exist(db_session, video_request.id) :
+            VideoPathExistException.error_raise()
+        if not os.path.exists(video_request.video) :
+            DataFileNotFoundError.error_raise()
+    else :
+        video_request.video = ""
     await inject_video_path(db_session, video_request)
 
     return VideoPathResponse(
@@ -81,13 +82,15 @@ async def change_video_source(
     db_session : AsyncSession = Depends(get_db),
     video_request : VideoPathRequest = Body(..., embed = True),
 ) -> VideoPathResponse :
-    if not await video_id_exist(db_session, video_request.id) :
-        InvalidIdException.error_raise()
-    if not await video_path_exist(db_session, video_request.id) :
-        VideoPathNotExistException.error_raise()
-    if not os.path.exists(video_request.video) :
-        DataFileNotFoundError.error_raise()
-    
+    if not video_request.is_err :
+        if not await video_id_exist(db_session, video_request.id) :
+            InvalidIdException.error_raise()
+        if not await video_path_exist(db_session, video_request.id) :
+            VideoPathNotExistException.error_raise()
+        if not os.path.exists(video_request.video) :
+            DataFileNotFoundError.error_raise()
+    else :
+        video_request.video = ""
     await inject_video_path(db_session, video_request)
 
     return VideoPathResponse(

@@ -56,6 +56,8 @@ class WantedDataSource(Base) :
     image = Column(TEXT, nullable=True)
     video = Column(TEXT, nullable=True)
     generated = Column(Integer, default=0, nullable = False)
+    driving_video = Column(TEXT, nullable=True),
+    error_msg = Column(TEXT, nullable=True)
 
     ## relationships
     _wanted = relationship("Wanted", back_populates="datasource", uselist=False)

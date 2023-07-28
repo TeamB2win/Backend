@@ -37,7 +37,9 @@ async def inject_video_path(db: AsyncSession, video_request : VideoPathRequest )
             .filter(WantedDataSource.id == video_request.id) \
             .values({
                 "video" : video_request.video,
-                "generated" : WantedDataSource.generated + 1
+                "generated" : WantedDataSource.generated + 1,
+                "video_source" : video_request.video_source,
+                "error_msg" : video_request.err_msg
             })
     await db.execute(query)
     await db.commit()
