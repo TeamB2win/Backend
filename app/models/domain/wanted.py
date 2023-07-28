@@ -1,7 +1,7 @@
 from typing import Optional, List
 from datetime import datetime
 from fastapi import File
-from pydantic import BaseModel, HttpUrl
+from pydantic import HttpUrl, Field
 
 from app.models.domain.base import BaseDomainModel
 
@@ -20,8 +20,8 @@ class WantedSourceData(BaseDomainModel) :
     image : str
     video : Optional[str]
     generated : int
-    driving_video : Optional[str]
-    error_msg : Optional[str]
+    driving_video : Optional[str] = Field(default = None)
+    error_msg : Optional[str] = Field(default = None)
     
 class WantedFullData(BaseDomainModel) :
     id : int
