@@ -19,7 +19,7 @@ class CreateWantedDataRequest(BaseSchemaModel):
     registered_address : Optional[str]
     residence : Optional[str]
     criminal : Optional[str]
-    relational_link : Optional[str]
+    relational_link : Optional[HttpUrl]
     characteristic : str
     started_at : datetime
     ended_at : datetime
