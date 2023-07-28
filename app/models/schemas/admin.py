@@ -25,10 +25,6 @@ class CreateWantedDataRequest(BaseSchemaModel):
     ended_at : datetime
     
     image : str
-    video : Optional[str]
-    generated : int
-    driving_video : Optional[str] = None
-    error_msg : Optional[str] = None
 
 class CreateWantedDataResponse(BaseSchemaModel):
     status : str = Field(default = 'OK')
@@ -53,11 +49,7 @@ class UpdateWantedDataRequest(BaseSchemaModel):
     ended_at : datetime
     
     image : str
-    video : Optional[str]
-    generated : int
-    driving_video : Optional[str] = None
-    error_msg : Optional[str] = None
-
+    
 # 범죄자 비디오 데이터 DB에게 요청
 class UpdateWantedVideoDataRequest(BaseSchemaModel):
     id : int
