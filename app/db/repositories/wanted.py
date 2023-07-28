@@ -70,8 +70,8 @@ class WantedDetail(Base):
             criminal = request.criminal,
             relational_link = str(request.relational_link),
             characteristic = request.characteristic,
-            started_at = request.started_at,
-            ended_at = request.ended_at
+            started_at = request.started_at.replace(tzinfo=None),
+            ended_at = request.ended_at.replace(tzinfo=None)
         )
     
 @dataclass
