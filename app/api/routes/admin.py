@@ -1,42 +1,35 @@
-from fastapi import FastAPI, Body, HTTPException, Depends
+from fastapi import APIRouter, Body, HTTPException, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.db import get_db
-from db.orm import CriminalData
-from models.domain.admin import create_criminal_data, search_criminal_data, search_criminals_data, delete_criminal_data
-from models.schemas.admin import CreateCriminalDataRequest, CriminalDataSchema, ListCriminalDataResponse
-#router = APIRouter(prefix = "/admin", tags = ["admin"])
+from app.db.events import get_db
+from app.db.queries.admin import create_wanted_data
 
-router = FastAPI()
+from app.db.repositories.wanted import Wanted, WantedDetail, WantedDataSource
+from app.models.schemas.admin import CreateWantedDataRequest, CreateWantedDataResponse
+
+router = APIRouter(prefix = "/admin", tags = ["admin"])
 
 from typing import List
-
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
-from sqlalchemy import select, delete
-
-
-# 전체 데이터 조회
-@router.get("/app", status_code=200)
-def search_criminals(
-    order: str | None = None,
-    session: Session = Depends(get_db),
-) -> ListCriminalDataResponse:
-    criminal_data_list: List[CriminalData] = search_criminals_data(session=session)
-    return ListCriminalDataResponse(
-        #criminal_data_list=[CriminalDataSchema.from_orm(criminal_data) for criminal_data in criminal_data_list]
-        CriminalData = criminal_data_list
-    )          
 
 
 # 데이터 추가
 @router.post("/app", status_code=201)
 def create_data(
-        request:CreateCriminalDataRequest,
-        session:Session = Depends(get_db),
-) -> CriminalDataSchema:
-    criminal_data: CriminalData = CriminalData.create(request=request)
-    criminal_data: CriminalData = create_criminal_data(session=session, criminal_data=criminal_data)
-    return CriminalDataSchema.from_orm(criminal_data)
+    request : CreateWantedDataRequest = Body(..., embed = True),
+    db_session: AsyncSession = Depends(get_db),
+) -> CreateWantedDataResponse:
+    wanted_data: Wanted = Wanted.create(request=request)
+    wanted_data: Wanted = create_wanted_data(db=db_session, wanted_data=wanted_data)
+
+    wanted_detail_data : WantedDetail = WantedDetail.create(request=request, id = wanted_data.id)
+    wanted_detail_data : WantedDetail = create_wanted_data(db=db_session, wanted_data=wanted_detail_data)
+
+    wanted_datasource_data : WantedDataSource = WantedDataSource.create(request=request, id = wanted_data.id)
+    wanted_datasource_data : WantedDataSource = create_wanted_data(db=db_session, wanted_data=wanted_datasource_data)
+
+    return CreateWantedDataResponse(
+        status = 'OK'
+    )
 
 '''
 # 데이터 수정
@@ -45,13 +38,13 @@ def update_data(
 '''
 
 # 데이터 삭제
-@router.delete("/app/{criminal_id}", status_code=204)
-def delete_data(
-        criminal_id: int,
-        session: Session = Depends(get_db),
-):
-    criminal: CriminalData | None = search_criminal_data(session=session, criminal_id=criminal_id)
-    if not criminal:
-        raise HTTPException(status_code=404, detail="ToDo Not Found")
+# @router.delete("/app/{criminal_id}", status_code=204)
+# def delete_data(
+#     criminal_id: int,
+#     db_session: AsyncSession = Depends(get_db),
+# ):
+#     criminal: CriminalData | None = search_criminal_data(session=session, criminal_id=criminal_id)
+#     if not criminal:
+#         raise HTTPException(status_code=404, detail="ToDo Not Found")
 
-    delete_criminal_data(session=session, criminal_id=criminal_id)
+#     delete_criminal_data(session=session, criminal_id=criminal_id)

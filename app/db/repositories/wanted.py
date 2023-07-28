@@ -6,6 +6,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
+from app.models.schemas.admin import CreateWantedDataRequest
 from app.db.repositories.base_class import Base
 
 from dataclasses import dataclass
@@ -25,9 +26,18 @@ class Wanted(Base):
     detail = relationship("WantedDetail", back_populates="_wanted")
     datasource = relationship("WantedDataSource", back_populates="_wanted")
     requester = relationship("Requester", back_populates="_wanted")
-    
-    
-    
+
+    @classmethod #orm 객체로 변환
+    def create(cls, request: CreateWantedDataRequest) -> "Wanted":
+        return cls(
+            wanted_id = request.wanted_id,
+            name = request.name,
+            sex = request.sex,
+            age = request.age,
+            wanted_type = request.wanted_type
+        )
+
+
 @dataclass
 class WantedDetail(Base):
     __tablename__ = "wanted_detail"
@@ -45,8 +55,22 @@ class WantedDetail(Base):
 
     ## relationships
     _wanted = relationship("Wanted", back_populates="detail", uselist=False)
+
     
-    
+    @classmethod #orm 객체로 변환
+    def create(cls, id, request: CreateWantedDataRequest) -> "WantedDetail":
+        return cls(
+            id = id,
+            height = request.height,
+            weight = request.weight,
+            registered_address = request.registered_address,
+            residence = request.residence,
+            criminal = request.criminal,
+            relational_link = request.relational_link,
+            characteristic = request.characteristic,
+            started_at = request.started_at,
+            ended_at = request.ended_at
+        )
     
 @dataclass
 class WantedDataSource(Base) :
@@ -61,3 +85,9 @@ class WantedDataSource(Base) :
 
     ## relationships
     _wanted = relationship("Wanted", back_populates="datasource", uselist=False)
+
+    def create(cls, id: int, request: CreateWantedDataRequest) -> "WantedDataSource":
+        return cls(
+            id = id,
+            image = request.image
+        )
