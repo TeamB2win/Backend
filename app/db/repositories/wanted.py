@@ -1,17 +1,15 @@
 from datetime import datetime
+from dataclasses import dataclass
 
 from sqlalchemy import ForeignKey, Column
 from sqlalchemy import (
     TEXT, Integer, String,
-    REAL, Sequence, Boolean,
-    TIMESTAMP
+    REAL, Boolean, TIMESTAMP
 )
 from sqlalchemy.orm import relationship
 
 from app.models.schemas.admin import CreateWantedDataRequest
 from app.db.repositories.base_class import Base
-
-from dataclasses import dataclass
 
 @dataclass
 class Wanted(Base):

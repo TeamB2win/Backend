@@ -1,10 +1,9 @@
 from datetime import datetime
 
 from pydantic import Field, HttpUrl
-from typing import List, Optional
+from typing import Optional
 
 from app.models.schemas.base import BaseSchemaModel
-from app.models.domain.wanted import WantedFullData
 
 # 범죄자 데이터 생성시 유저에게 요청사항
 class CreateWantedDataRequest(BaseSchemaModel):
@@ -27,6 +26,7 @@ class CreateWantedDataRequest(BaseSchemaModel):
     image : str
 
 class CreateWantedDataResponse(BaseSchemaModel):
+    data_hash : str
     status : str = Field(default = 'OK')
 
 

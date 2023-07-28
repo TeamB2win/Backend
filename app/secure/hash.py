@@ -1,8 +1,9 @@
 from collections import OrderedDict
-from typing import List
 import hashlib 
 
-from datetime import datetime
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.queries.wanted import get_full_wanted_data
 
 wanted_data_hash = ""
 
@@ -50,3 +51,9 @@ def compare_data_hash(
     required_data_hash : str,
 ) -> bool :
     return required_data_hash==wanted_data_hash
+
+async def generate_data_hash(
+    db_session : AsyncSession,
+) -> str :
+    wanted_data = await get_full_wanted_data(db = db_session)
+    return calculate_hash( wanted_data )

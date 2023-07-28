@@ -8,6 +8,7 @@ from app.api.errors.http_errors import HTTP_Exception
 from app.models.schemas.wanted import VideoPathRequest, VideoPathResponse
 from app.db.events import get_db
 from app.db.queries.wanted import video_id_exist, video_path_exist, inject_video_path
+from app.secure.hash import generate_data_hash
 from app.resources import strings
 
 router = APIRouter(prefix = "/dl", tags = ["dl"])
@@ -61,6 +62,7 @@ async def register_video_path(
     else :
         video_request.video = ""
     await inject_video_path(db_session, video_request)
+    await generate_data_hash( db_session )
 
     return VideoPathResponse(
         id = video_request.id,
@@ -92,6 +94,7 @@ async def change_video_source(
     else :
         video_request.video = ""
     await inject_video_path(db_session, video_request)
+    await generate_data_hash( db_session )
 
     return VideoPathResponse(
         id = video_request.id,
