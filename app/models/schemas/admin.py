@@ -19,7 +19,7 @@ class CreateWantedDataRequest(BaseSchemaModel):
     registered_address : Optional[str]
     residence : Optional[str]
     criminal : Optional[str]
-    relational_link : Optional[HttpUrl]
+    relational_link : Optional[str]
     characteristic : str
     started_at : datetime
     ended_at : datetime
@@ -49,7 +49,7 @@ class UpdateWantedDataRequest(BaseSchemaModel):
     ended_at : datetime
     
     image : str
-    
+
 # 범죄자 비디오 데이터 DB에게 요청
 class UpdateWantedVideoDataRequest(BaseSchemaModel):
     id : int
