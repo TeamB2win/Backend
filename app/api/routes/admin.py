@@ -13,21 +13,26 @@ router = APIRouter(prefix = "/admin", tags = ["admin"])
 @router.post(
     path = "", 
     status_code=status.HTTP_201_CREATED,
-    response_model=CreateWantedDataResponse
+    response_model=CreateWantedDataResponse,
+    name = "admin:create-wanted-data",
 )
 async def create_data(
     request : CreateWantedDataRequest = Body(..., embed = True),
     db_session : AsyncSession = Depends(get_db),
 ) -> CreateWantedDataResponse:
     
-    wanted_data : Wanted = Wanted.create(request=request)
-    wanted_data : Wanted = await create_wanted_data(db=db_session, data_table=wanted_data)
+    try :
+        async with db_session.begin_nested() :
+            wanted_data : Wanted = Wanted.create(request=request)
+            wanted_data : Wanted = await create_wanted_data(db=db_session, data_table=wanted_data)
+        
+            wanted_detail_data : WantedDetail = WantedDetail.create(request=request, id=wanted_data.id)
+            wanted_detail_data : WantedDetail = await create_wanted_data(db=db_session, data_table=wanted_detail_data)
 
-    wanted_detail_data : WantedDetail = WantedDetail.create(request=request, id=wanted_data.id)
-    wanted_detail_data : WantedDetail = await create_wanted_data(db=db_session, data_table=wanted_detail_data)
-
-    wanted_datasource_data : WantedDataSource = WantedDataSource.create(request=request, id=wanted_data.id)
-    wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
+            wanted_datasource_data : WantedDataSource = WantedDataSource.create(request=request, id=wanted_data.id)
+            wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
+    except :
+        db_session.rollback()
 
     data_hash : str = await generate_data_hash( db_session )
 
