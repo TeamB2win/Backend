@@ -9,23 +9,25 @@ from app.models.schemas.base import BaseSchemaModel
 
 # 범죄자 데이터 생성시 유저에게 요청사항
 class CreateWantedDataRequest(BaseSchemaModel):
+    # essential
     wanted_id : int
-    name : Optional[str]
-    sex : bool
-    age : Optional[int]
     wanted_type : bool
-
-    height : Optional[int]
-    weight : Optional[str]
-    registered_address : Optional[str]
-    residence : Optional[str]
-    criminal : Optional[str]
-    relational_link : Optional[HttpUrl]
-    characteristic : str
-    started_at : datetime
-    ended_at : datetime
-    
+    sex : bool
     image : Annotated[bytes, File()]
+    
+    # optional
+    name : Optional[str] = None
+    age : Optional[int] = None
+    height : Optional[int] = Field(default=None)
+    weight : Optional[str] = Field(default=None)
+    registered_address : Optional[str] = Field(default=None)
+    residence : Optional[str] = Field(default=None)
+    criminal : Optional[str] = Field(default=None)
+    relational_link : Optional[HttpUrl] = Field(default=None)
+    characteristic : str = Field(default=None)
+    started_at : Optional[datetime] = Field(default=datetime.now())
+    ended_at : Optional[datetime] = Field(default=datetime.now())
+    
 
 class CreateWantedDataResponse(BaseSchemaModel):
     data_hash : str
