@@ -1,7 +1,8 @@
 import os
 import hashlib
+import io
 
-import cv2
+from PIL import Image 
 import imageio
 import numpy as np
 from fastapi import APIRouter, Body, Depends, status
@@ -15,17 +16,18 @@ from app.secure.hash import generate_data_hash
 from app.api.errors.http_errors import HTTP_Exception
 from app.resources import strings
 
+
 router = APIRouter(prefix = "/admin", tags = ["admin"])
 
-ImageSaveException = HTTP_Exception(
+ImageReadException = HTTP_Exception(
     status_code=status.HTTP_400_BAD_REQUEST,
     description=strings.DSCRIPTION_400_ERROR_FOR_DATA_FILE,
-    detail="Invalid Image Bytes"
+    detail="Can't Read the image"
 )
 ImageOpenException = HTTP_Exception(
     status_code=status.HTTP_400_BAD_REQUEST,
     description=strings.DSCRIPTION_400_ERROR_FOR_DATA_FILE,
-    detail="Can't open image by using image framework"
+    detail="Can't open image by using image framework(imageio)"
 )
 
 # 데이터 추가
@@ -34,7 +36,7 @@ ImageOpenException = HTTP_Exception(
     status_code=status.HTTP_201_CREATED,
     response_model=CreateWantedDataResponse,
     responses={
-        **ImageSaveException.responses
+        **ImageReadException.responses
     }
 )
 async def create_data(
@@ -54,15 +56,13 @@ async def create_data(
     image_path = os.path.join("/workspace/data", m.hexdigest() + '.png')
     # decode bytes to image
     try:
-        encoded_img = np.fromstring(request.image, dtype=np.uint8)
-        img = cv2.imdecode(encoded_img, cv2.IMREAD_COLOR)
-        cv2.imwrite(image_path, img)
+        image = Image.open(io.BytesIO(request.image))
+        image.save(image_path)
     except:
-        ImageSaveException.error_raise()
+        ImageReadException.error_raise()
     
     # check to open Image by paths
     try:
-        cv2.imread(image_path)
         imageio.imread(image_path) 
     except:
         ImageOpenException.error_raise()
