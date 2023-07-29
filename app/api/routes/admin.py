@@ -22,17 +22,17 @@ async def create_data(
 ) -> CreateWantedDataResponse:
     
     try :
-        async with db_session.begin_nested() :
-            wanted_data : Wanted = Wanted.create(request=request)
-            wanted_data : Wanted = await create_wanted_data(db=db_session, data_table=wanted_data)
-        
-            wanted_detail_data : WantedDetail = WantedDetail.create(request=request, id=wanted_data.id)
-            wanted_detail_data : WantedDetail = await create_wanted_data(db=db_session, data_table=wanted_detail_data)
+        wanted_data : Wanted = Wanted.create(request=request)
+        wanted_data : Wanted = await create_wanted_data(db=db_session, data_table=wanted_data)
+    
+        wanted_detail_data : WantedDetail = WantedDetail.create(request=request, id=wanted_data.id)
+        wanted_detail_data : WantedDetail = await create_wanted_data(db=db_session, data_table=wanted_detail_data)
 
-            wanted_datasource_data : WantedDataSource = WantedDataSource.create(request=request, id=wanted_data.id)
-            wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
+        wanted_datasource_data : WantedDataSource = WantedDataSource.create(request=request, id=wanted_data.id)
+        wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
+        await db_session.commit()
     except :
-        db_session.rollback()
+        await db_session.rollback()
 
     data_hash : str = await generate_data_hash( db_session )
 
