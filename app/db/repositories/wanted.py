@@ -87,8 +87,8 @@ class WantedDataSource(Base) :
     _wanted = relationship("Wanted", back_populates="datasource", uselist=False)
 
     @classmethod
-    def create(cls, id: int, request: CreateWantedDataRequest) -> "WantedDataSource":
+    def create(cls, id: int, image_path: str) -> "WantedDataSource":
         return cls(
             id = id,
-            image = request.image
+            image = image_path
         )

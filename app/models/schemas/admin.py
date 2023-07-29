@@ -1,7 +1,9 @@
+from typing import Annotated
 from datetime import datetime
 
 from pydantic import Field, HttpUrl
 from typing import Optional
+from fastapi import File
 
 from app.models.schemas.base import BaseSchemaModel
 
@@ -23,7 +25,7 @@ class CreateWantedDataRequest(BaseSchemaModel):
     started_at : datetime
     ended_at : datetime
     
-    image : str
+    image : Annotated[bytes, File()]
 
 class CreateWantedDataResponse(BaseSchemaModel):
     data_hash : str
@@ -48,7 +50,7 @@ class UpdateWantedDataRequest(BaseSchemaModel):
     started_at : datetime
     ended_at : datetime
     
-    image : str
+    image : Annotated[bytes, File()]
 
 # 범죄자 비디오 데이터 DB에게 요청
 class UpdateWantedVideoDataRequest(BaseSchemaModel):
