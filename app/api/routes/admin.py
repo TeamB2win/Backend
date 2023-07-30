@@ -4,7 +4,6 @@ import io
 
 from PIL import Image 
 import imageio
-import numpy as np
 from fastapi import APIRouter, Body, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,9 +39,29 @@ ImageOpenException = HTTP_Exception(
     }
 )
 async def create_data(
-    request : CreateWantedDataRequest = Body(..., embed = True),
+    request : CreateWantedDataRequest,
     db_session : AsyncSession = Depends(get_db),
 ) -> CreateWantedDataResponse:
+    # get image name
+    m = hashlib.sha256(f"source_{request.wanted_id}_{request.started_at}".encode('utf-8'))    
+    image_path = os.path.join("/workspace/data", m.hexdigest() + '.png')
+    # decode bytes to image
+    try:
+        image = Image.open(request.image.file)
+        image.save(image_path)
+    except:
+        if os.path.exists(image_path):
+            os.remove(image_path)
+        print("Fail to Read the Image bytes")
+        ImageReadException.error_raise()
+    
+    # check to open Image by paths
+    try:
+        imageio.imread(image_path) 
+    except:
+        print("Fail to Open the Image using imageio")
+        ImageOpenException.error_raise()
+
     # Add to wanted Table in B2win DB  
     wanted_data : Wanted = Wanted.create(request=request)
     wanted_data : Wanted = await create_wanted_data(db=db_session, data_table=wanted_data)
@@ -51,21 +70,6 @@ async def create_data(
     wanted_detail_data : WantedDetail = WantedDetail.create(request=request, id=wanted_data.id)
     wanted_detail_data : WantedDetail = await create_wanted_data(db=db_session, data_table=wanted_detail_data)
 
-    # get image name
-    m = hashlib.sha256(f"source_{wanted_data.id}".encode('utf-8'))    
-    image_path = os.path.join("/workspace/data", m.hexdigest() + '.png')
-    # decode bytes to image
-    try:
-        image = Image.open(io.BytesIO(request.image))
-        image.save(image_path)
-    except:
-        ImageReadException.error_raise()
-    
-    # check to open Image by paths
-    try:
-        imageio.imread(image_path) 
-    except:
-        ImageOpenException.error_raise()
         
     wanted_datasource_data : WantedDataSource = WantedDataSource.create(image_path=image_path, id=wanted_data.id)
     wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
