@@ -11,7 +11,7 @@ class WantedDetailData(BaseDomainModel) :
     registered_address : Optional[str]
     residence : Optional[str]
     criminal : Optional[str]
-    relational_link : Optional[Union[HttpUrl, str]]
+    relational_link : Optional[str]
     characteristic : Optional[str]
     started_at : datetime
     ended_at : datetime
