@@ -34,6 +34,6 @@ def get_application() -> FastAPI:
     # inject FastAPI router
     application.include_router(router)
 
-    return application
+    return application, settings
 
-app = get_application()
+app, settings = get_application()

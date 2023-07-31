@@ -15,7 +15,7 @@ from app.models.schemas.admin import *
 from app.secure.hash import generate_data_hash
 from app.api.errors.http_errors import HTTP_Exception
 from app.resources import strings
-
+from main import settings
 
 router = APIRouter(prefix = "/admin", tags = ["admin"])
 
@@ -35,7 +35,6 @@ ImagePathException = HTTP_Exception(
     detail="Can't find image path"
 )
 
-IMAGE_DIR = '/workspace/image'
 # Image upload
 @router.post(
     path="/uploadimage",
@@ -51,7 +50,7 @@ async def upload_image(
 ) -> UploadImageResponse:
     # get image name
     current_time = datetime.now().strftime("%Y%m%d%H%M%S")
-    image_path = os.path.join(IMAGE_DIR, ''.join([current_time, secrets.token_hex(16)]))
+    image_path = os.path.join(settings.IMAGE_DIR, ''.join([current_time, secrets.token_hex(16)]))
     try:
         image_type = file.content_type.split('/')[-1]
         image_path += f".{image_type}"
@@ -85,8 +84,6 @@ async def upload_image(
         **ImagePathException.responses
     },
     name = "admin:create-wanted-data",
-
-
 )
 async def create_data(
     request : CreateWantedDataRequest,
@@ -96,7 +93,6 @@ async def create_data(
     if not os.path.exists(request.image):
         print(f"Invalid Image path {request.image}")
         ImagePathException.error_raise()
-    
     try:
         # Add to wanted Table in B2win DB  
         wanted_data : Wanted = Wanted.create(request=request)
@@ -108,15 +104,17 @@ async def create_data(
 
         wanted_datasource_data : WantedDataSource = WantedDataSource.create(image_path=request.image, id=wanted_data.id)
         wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
-        print("insert data into table")
     except:
         await db_session.rollback()
         
         # Image 삭제
         if os.path.exists(request.image):
             os.remove(request.image)
-            
-    data_hash : str = await generate_data_hash( db_session )
+
+    # TODO: DL server로 요청 보내기
+    # 예외처리
+    
+    data_hash: str = await generate_data_hash( db_session )
 
     return CreateWantedDataResponse(
         data_hash = data_hash,

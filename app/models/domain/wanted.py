@@ -15,7 +15,7 @@ class WantedDetailData(BaseDomainModel) :
     characteristic : Optional[str]
     started_at : datetime
     ended_at : datetime
-
+    
 class WantedSourceData(BaseDomainModel) :
     image : str
     video : Optional[str]
