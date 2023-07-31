@@ -30,7 +30,7 @@ class CreateWantedDataRequest(BaseSchemaModel):
     registered_address : Optional[str] = None
     residence : Optional[str] = None
     criminal : Optional[str] = None
-    relational_link : Optional[HttpUrl] = None
+    relational_link : Optional[str] = None
     characteristic : Optional[str] = None
     started_at : Optional[datetime] = datetime.now() # 긴급수배일 경우 현재 시간
     ended_at : Optional[datetime] = datetime.now()
