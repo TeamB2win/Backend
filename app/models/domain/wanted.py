@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 from datetime import datetime
 from fastapi import File
 from pydantic import HttpUrl, Field
@@ -11,8 +11,8 @@ class WantedDetailData(BaseDomainModel) :
     registered_address : Optional[str]
     residence : Optional[str]
     criminal : Optional[str]
-    relational_link : Optional[HttpUrl]
-    characteristic : str
+    relational_link : Optional[Union[HttpUrl, str]]
+    characteristic : Optional[str]
     started_at : datetime
     ended_at : datetime
 
