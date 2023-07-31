@@ -21,6 +21,7 @@ from app.secure.hash import generate_data_hash
 from app.api.errors.http_errors import HTTP_Exception, image_remove
 from app.resources import strings
 
+
 router = APIRouter(prefix = "/admin", tags = ["admin"])
 
 ImageWriteException = HTTP_Exception(
@@ -101,7 +102,6 @@ async def create_data(
     request : CreateWantedDataRequest,
     db_session : AsyncSession = Depends(get_db),
 ) -> CreateWantedDataResponse:
-    print("what the fuck")
     # Validate image path
     if not os.path.exists(request.image):
         print(f"Invalid Image path {request.image}")
@@ -110,15 +110,17 @@ async def create_data(
         # Add to wanted Table in B2win DB  
         wanted_data : Wanted = Wanted.create(request=request)
         wanted_data : Wanted = await create_wanted_data(db=db_session, data_table=wanted_data)
-
+        print("insert data into wanted")
         # Add to wanted_detail Table in B2win DB  
         wanted_detail_data : WantedDetail = WantedDetail.create(request=request, id=wanted_data.id)
         wanted_detail_data : WantedDetail = await create_wanted_data(db=db_session, data_table=wanted_detail_data)
+        print("insert data into wanted_detail")
 
         wanted_datasource_data : WantedDataSource = WantedDataSource.create(image_path=request.image, id=wanted_data.id)
         wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
+        print("insert data into wanted_datasource")
 
-        ## 이미지 dl 서버로 전송
+        ## DL 서버 추론 요청
         dl_request = CreateVideoDataToDLRequest(
             id = wanted_data.id,
             image_path = wanted_datasource_data.image,
@@ -127,16 +129,14 @@ async def create_data(
             video_path = wanted_datasource_data.video
         )
         print(dl_request)
-        dl_response = request_dl_server( data = dl_request )
-        if dl_response.status == "OK" :
-            await db_session.commit()
+        await request_dl_server( data = dl_request )
+
+        # DB 저장 
+        await db_session.commit()
 
     except:
         await db_session.rollback()
         DBRegisterException.error_raise( image_path = request.image )
-
-    # TODO: DL server로 요청 보내기
-    # 예외처리
     
     data_hash: str = await generate_data_hash( db_session )
 
@@ -147,8 +147,9 @@ async def create_data(
 
 async def request_dl_server(data):
     url = os.path.join(os.environ["DL_URL"], "api", "inference")
+    print(url)
     async with httpx.AsyncClient() as client:
-        response = await client.post(url, json=json.dump(data))
+        response = await client.post(url, data=data.json())
         print(response)
 
     return response

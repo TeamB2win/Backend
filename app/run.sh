@@ -5,7 +5,7 @@
 # export PORT=${PORT:-8001}
 export PYTHONPATH="$(cd .. && pwd)"
 # export IMAGE_DIR="/workspace/data/image"
-export IMAGE_DIR="/Users/magenta/Downloads"
+export IMAGE_DIR="/workspace/data/image"
 export DL_URL="http://63.35.31.27:8080"
 export FRONT_URL="http://63.35.31.27:"
 APP_MODULE="main:app"
