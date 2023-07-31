@@ -14,7 +14,7 @@ from app.resources import strings
 router = APIRouter(prefix = "/wanted", tags = ["wanted"])
 HttpError404 = HTTP_Exception(
     status_code = status.HTTP_404_NOT_FOUND,
-    description = strings.DSCRIPTION_404_ERROR,
+    description = strings.DESCRIPTION_404_ERROR,
     detail = strings.DATA_NOT_FOUND
 )
 

@@ -16,25 +16,25 @@ api_key_header = APIKeyHeader(name="Token")
 
 InvalidIdException = HTTP_Exception(
     status_code = status.HTTP_404_NOT_FOUND,
-    description = strings.DSCRIPTION_404_ERROR,
-    detail = strings.ID_NOT_FOUD
+    description = strings.DESCRIPTION_404_ERROR,
+    detail = strings.ID_NOT_FOUND
 )
 
 VideoPathExistException = HTTP_Exception(
     status_code = status.HTTP_400_BAD_REQUEST,
-    description = strings.DSCRIPTION_400_ERROR,
+    description = strings.DESCRIPTION_400_ERROR,
     detail = strings.VIDEO_PATH_ALREADY_EXIST
 )
 
 VideoPathNotExistException = HTTP_Exception(
     status_code = status.HTTP_400_BAD_REQUEST,
-    description = strings.DSCRIPTION_400_ERROR,
+    description = strings.DESCRIPTION_400_ERROR,
     detail = strings.VIDEO_PATH_NOT_EXIST
 )
 
 DataFileNotFoundError = HTTP_Exception(
     status_code = status.HTTP_400_BAD_REQUEST,
-    description = strings.DSCRIPTION_400_ERROR_FOR_DATA_FILE,
+    description = strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
     detail = strings.INVAILD_FILE
 )
 

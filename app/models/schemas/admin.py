@@ -65,3 +65,10 @@ class UpdateWantedDataRequest(BaseSchemaModel):
 class UpdateWantedVideoDataRequest(BaseSchemaModel):
     id : int
     video_url: Optional[bytes]
+
+class CreateVideoDataToDLRequest(BaseException) :
+    id : int
+    image_path : str
+    wanted_type : bool
+    prev_driving_path : str
+    video_path : str

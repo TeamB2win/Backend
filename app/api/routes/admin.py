@@ -1,6 +1,8 @@
 import os
 import io
-import datetime, secrets
+from datetime import datetime
+import secrets
+import json
 
 import asyncio
 import imageio
@@ -11,29 +13,40 @@ import httpx
 from app.db.events import get_db
 from app.db.queries.admin import create_wanted_data
 from app.db.repositories.wanted import Wanted, WantedDetail, WantedDataSource
-from app.models.schemas.admin import *
+from app.models.schemas.admin import (
+    CreateVideoDataToDLRequest, UploadImageResponse, CreateWantedDataRequest,
+    CreateWantedDataResponse,
+)
 from app.secure.hash import generate_data_hash
-from app.api.errors.http_errors import HTTP_Exception
+from app.api.errors.http_errors import HTTP_Exception, image_remove
 from app.resources import strings
-from main import settings
 
 router = APIRouter(prefix = "/admin", tags = ["admin"])
 
 ImageWriteException = HTTP_Exception(
     status_code=status.HTTP_400_BAD_REQUEST,
-    description=strings.DSCRIPTION_400_ERROR_FOR_DATA_FILE,
-    detail="Can't write the image"
+    description=strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
+    detail=strings.IMAGE_NOT_WRITABLE,
+    action = image_remove
 )
 ImageOpenException = HTTP_Exception(
     status_code=status.HTTP_400_BAD_REQUEST,
-    description=strings.DSCRIPTION_400_ERROR_FOR_DATA_FILE,
-    detail="Can't open image by using image framework(imageio)"
+    description=strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
+    detail=strings.IMAGE_NOT_OPEN_BY_IMAGEIO,
+    action=image_remove
 )
 ImagePathException = HTTP_Exception(
     status_code=status.HTTP_400_BAD_REQUEST,
-    description=strings.DSCRIPTION_400_ERROR_FOR_DATA_FILE,
-    detail="Can't find image path"
+    description=strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
+    detail=strings.INVAILD_FILE
 )
+DBRegisterException = HTTP_Exception(
+    status_code = status.HTTP_400_BAD_REQUEST,
+    description=strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
+    detail=strings.DB_DL_PROCESS_NOT_COMPLETED,
+    action=image_remove
+)
+
 
 # Image upload
 @router.post(
@@ -50,30 +63,28 @@ async def upload_image(
 ) -> UploadImageResponse:
     # get image name
     current_time = datetime.now().strftime("%Y%m%d%H%M%S")
-    image_path = os.path.join(settings.IMAGE_DIR, ''.join([current_time, secrets.token_hex(16)]))
+    image_path = os.path.join(os.environ["IMAGE_DIR"], ''.join([current_time, secrets.token_hex(16)]))
+    print(image_path)
     try:
         image_type = file.content_type.split('/')[-1]
         image_path += f".{image_type}"
         with open(image_path, 'wb+') as file_object:
             file_object.write(file.file.read())
     except:
-        if os.path.exists(image_path):
-            os.remove(image_path)
         print("Fail to Read the Image bytes")
-        ImageWriteException.error_raise()
+        ImageWriteException.error_raise( image_path = image_path )
 
     # check to open Image by paths
     try:
         imageio.imread(image_path) 
     except:
         print("Fail to Open the Image using imageio")
-        ImageOpenException.error_raise()
+        ImageOpenException.error_raise( image_path = image_path )
 
     return UploadImageResponse(
         image_path=image_path,
         status="OK"
     )
-
 
 # 데이터 추가
 @router.post(
@@ -81,7 +92,8 @@ async def upload_image(
     status_code=status.HTTP_201_CREATED,
     response_model=CreateWantedDataResponse,
     responses={
-        **ImagePathException.responses
+        **ImagePathException.responses,
+        **DBRegisterException.responses
     },
     name = "admin:create-wanted-data",
 )
@@ -89,6 +101,7 @@ async def create_data(
     request : CreateWantedDataRequest,
     db_session : AsyncSession = Depends(get_db),
 ) -> CreateWantedDataResponse:
+    print("what the fuck")
     # Validate image path
     if not os.path.exists(request.image):
         print(f"Invalid Image path {request.image}")
@@ -104,12 +117,23 @@ async def create_data(
 
         wanted_datasource_data : WantedDataSource = WantedDataSource.create(image_path=request.image, id=wanted_data.id)
         wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
+
+        ## 이미지 dl 서버로 전송
+        dl_request = CreateVideoDataToDLRequest(
+            id = wanted_data.id,
+            image_path = wanted_datasource_data.image,
+            wanted_type = wanted_data.wanted_type,
+            prev_driving_path = wanted_datasource_data.driving_video,
+            video_path = wanted_datasource_data.video
+        )
+        print(dl_request)
+        dl_response = request_dl_server( data = dl_request )
+        if dl_response.status == "OK" :
+            await db_session.commit()
+
     except:
         await db_session.rollback()
-        
-        # Image 삭제
-        if os.path.exists(request.image):
-            os.remove(request.image)
+        DBRegisterException.error_raise( image_path = request.image )
 
     # TODO: DL server로 요청 보내기
     # 예외처리
@@ -122,9 +146,9 @@ async def create_data(
     )
 
 async def request_dl_server(data):
-    url = "http://63.35.31.27:8080/api/inference"
+    url = os.path.join(os.environ["DL_URL"], "api", "inference")
     async with httpx.AsyncClient() as client:
-        response = await client.post(url, json=data)
+        response = await client.post(url, json=json.dump(data))
         print(response)
 
     return response

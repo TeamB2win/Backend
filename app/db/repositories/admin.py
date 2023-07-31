@@ -1,5 +1,5 @@
 from sqlalchemy import ForeignKey, Column
-from sqlalchemy import Integer, VARCHAR, Sequence
+from sqlalchemy import Integer, VARCHAR, Sequence, TIMESTAMP
 
 from sqlalchemy.orm import relationship
 from app.db.repositories.base_class import Base
@@ -10,7 +10,7 @@ class Admin(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     admin_id = Column(VARCHAR, nullable=False)
     password = Column(VARCHAR, nullable=False)
-    age = Column(Integer, nullable=True)
+    created_at = Column(TIMESTAMP, nullable=True)
 
     ## relationships
     detail = relationship("AdminDetail", back_populates="_admin")

@@ -5,11 +5,12 @@ from app.api.endpoint import router
 from app.config.app import get_app_settings
 from app.core.events import create_start_app_handler, create_stop_app_handler
 
+settings = get_app_settings()
 
 def get_application() -> FastAPI:
+    global settings
     # initialize FastAPI and settings
     application = FastAPI()
-    settings = get_app_settings()
     
     # setting midware for cross-domain situation (react.js, For example)
 
@@ -34,6 +35,6 @@ def get_application() -> FastAPI:
     # inject FastAPI router
     application.include_router(router)
 
-    return application, settings
+    return application
 
-app, settings = get_application()
+app = get_application()

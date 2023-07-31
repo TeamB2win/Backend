@@ -6,7 +6,6 @@ from pydantic import PostgresDsn
 class AppSettings() :
     allowed_hosts : List[str] = ["*"]
     database_url : PostgresDsn
-    Image_dir: str = "/workspace/image"
 
     min_connection_count : int = 10
     max_connection_count : int = 20
