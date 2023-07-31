@@ -138,6 +138,9 @@ async def create_data(
         await db_session.rollback()
         DBRegisterException.error_raise( image_path = request.image )
     
+    finally :
+        await db_session.close()
+    
     data_hash: str = await generate_data_hash( db_session )
 
     return CreateWantedDataResponse(

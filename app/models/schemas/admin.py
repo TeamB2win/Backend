@@ -70,6 +70,6 @@ class CreateVideoDataToDLRequest(BaseSchemaModel) :
     id : int
     image_path : str
     wanted_type : bool
-    prev_driving_path: str | None
-    video_path : str | None
+    prev_driving_path: Optional[str] = None
+    video_path : Optional[str] = None
     

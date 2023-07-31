@@ -93,7 +93,11 @@ async def change_video_source(
             DataFileNotFoundError.error_raise()
     else :
         video_request.video = ""
-    await inject_video_path(db_session, video_request)
+    try :
+        await inject_video_path(db_session, video_request)
+    finally :
+        await db_session.close()
+
     await generate_data_hash( db_session )
 
     return VideoPathResponse(
