@@ -51,8 +51,8 @@ DataFileNotFoundError = HTTP_Exception(
     name = "dl:register-video-path",
 )
 async def register_video_path(
+    video_request : VideoPathRequest,
     db_session : AsyncSession = Depends(get_db),
-    video_request : VideoPathRequest = Body(..., embed = True),
 ) -> VideoPathResponse :
     if not video_request.is_err :
         if not await video_id_exist(db_session, video_request.id) :
@@ -94,8 +94,8 @@ async def register_video_path(
     name = "dl:change-video-source",
 )
 async def change_video_source(
+    video_request : VideoPathRequest,
     db_session : AsyncSession = Depends(get_db),
-    video_request : VideoPathRequest = Body(..., embed = True),
 ) -> VideoPathResponse :
     if not video_request.is_err :
         if not await video_id_exist(db_session, video_request.id) :
