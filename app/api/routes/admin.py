@@ -11,11 +11,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import httpx
 
 from app.db.events import get_db
-from app.db.queries.admin import create_wanted_data
+from app.db.queries.admin import create_wanted_data, delete_wanted_data
+from app.db.queries.wanted import get_wanted_data
 from app.db.repositories.wanted import Wanted, WantedDetail, WantedDataSource
 from app.models.schemas.admin import (
     CreateVideoDataToDLRequest, UploadImageResponse, CreateWantedDataRequest,
-    CreateWantedDataResponse,
+    CreateWantedDataResponse, DeleteWantedRequest, DeleteWantedResponse
 )
 from app.secure.hash import generate_data_hash
 from app.api.errors.http_errors import HTTP_Exception, image_remove
@@ -31,8 +32,8 @@ ImageWriteException = HTTP_Exception(
     action = image_remove
 )
 ImageOpenException = HTTP_Exception(
-    status_code=status.HTTP_400_BAD_REQUEST,
-    description=strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
+    status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+    description=strings.DESCRIPTION_415_ERROR,
     detail=strings.IMAGE_NOT_OPEN_BY_IMAGEIO,
     action=image_remove
 )
@@ -43,11 +44,20 @@ ImagePathException = HTTP_Exception(
 )
 DBRegisterException = HTTP_Exception(
     status_code = status.HTTP_400_BAD_REQUEST,
-    description=strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
-    detail=strings.DB_DL_PROCESS_NOT_COMPLETED,
-    action=image_remove
+    description = strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
+    detail = strings.DB_DL_PROCESS_NOT_COMPLETED,
+    action = image_remove
 )
-
+InvaildIDException = HTTP_Exception(
+    status_code = status.HTTP_400_BAD_REQUEST,
+    description = strings.DESCRIPTION_400_ERROR,
+    detail = strings.ID_NOT_FOUND
+)
+DBProcessException = HTTP_Exception(
+    status_code = status.HTTP_400_BAD_REQUEST,
+    description = strings.DESCRIPTION_400_ERROR,
+    detail = strings.DB_PROCESS_NOT_COMPLETED
+)
 
 # Image upload
 @router.post(
@@ -99,8 +109,8 @@ async def upload_image(
     },
     name = "admin:create-wanted-data",
 )
-async def create_data(
-    request : CreateWantedDataRequest,
+async def create_wanted_data_api(
+    request : CreateWantedDataRequest = Body(..., embed=True),
     db_session : AsyncSession = Depends(get_db),
 ) -> CreateWantedDataResponse:
     # Validate image path
@@ -157,6 +167,41 @@ async def request_dl_server(data):
         print(response)
 
     return response
+
+@router.delete(
+    path = "",
+    status_code = status.HTTP_202_ACCEPTED,
+    response_model = DeleteWantedResponse,
+    responses = {
+        **InvaildIDException.responses,
+        **DBProcessException.responses
+    },
+    name = "admin:delete-wanted-by-id"
+)
+async def delete_wanted_data_api(
+    request : DeleteWantedRequest = Body(..., embed = True),
+    db_session : AsyncSession = Depends(get_db),    
+) -> DeleteWantedResponse:
+    data = await get_wanted_data( db = db_session, id = request.id )
+    if data is None :
+        raise InvaildIDException.error_raise()
+    try :
+        data_sources = await delete_wanted_data( db = db_session, id = request.id )
+        for paths in data_sources :
+            if os.path.exists(paths) :
+                os.remove(paths)
+    except :
+        await db_session.rollback()
+        raise DBProcessException.error_raise()
+    await generate_data_hash( db_session )
+    await db_session.commit()
+    await db_session.close()
+    
+    return DeleteWantedResponse(
+        id = request.id,
+        status = 'OK'
+    )
+
 '''
 # 데이터 수정
 @router.patch("/app/{criminal_id}", status_code=200)

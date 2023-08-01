@@ -1,7 +1,7 @@
 from typing import Annotated
 from datetime import datetime
 
-from pydantic import Field, HttpUrl
+from pydantic import Field, HttpUrl, validator
 from typing import Optional
 from fastapi import File, UploadFile
 
@@ -72,4 +72,18 @@ class CreateVideoDataToDLRequest(BaseSchemaModel) :
     wanted_type : bool
     prev_driving_path: Optional[str] = None
     video_path : Optional[str] = None
-    
+
+
+# 범죄자 데이터 삭제 요청 및 응답
+class DeleteWantedRequest(BaseSchemaModel) :
+    id : int
+
+class DeleteWantedResponse(BaseSchemaModel) :
+    id : int
+    status : str = Field(default = 'OK')
+
+    @validator('status')
+    @classmethod
+    def status_check(cls, v) :
+        assert v in ['OK', 'INVALID'], ValueError('Invaild Status')
+        return v
