@@ -23,9 +23,9 @@ class CheckHashResponse(BaseSchemaModel) :
     
 class VideoPathRequest(BaseSchemaModel) :
     id : int
-    video : Optional[str]
-    video_source : Optional[str]
 
+    video : Optional[str] = None
+    driving_video : Optional[str] = None
     is_err : Optional[bool] = Field(default = False)
     err_msg : Optional[str] = None
 
