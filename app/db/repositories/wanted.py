@@ -79,7 +79,7 @@ class WantedDataSource(Base) :
     id = Column(Integer, ForeignKey("wanted.id"), primary_key=True)
     image = Column(TEXT, nullable=True)
     video = Column(TEXT, nullable=True)
-    generated = Column(Integer, default=0, nullable = False)
+    generated = Column(Integer, default=0, nullable = True)
     driving_video = Column(TEXT, nullable=True)
     error_msg = Column(TEXT, nullable=True)
 

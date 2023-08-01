@@ -1,7 +1,6 @@
 import os
 
 from fastapi import APIRouter, Depends, status, Body
-from fastapi.security import APIKeyHeader
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.errors.http_errors import HTTP_Exception, image_remove
@@ -11,33 +10,29 @@ from app.db.queries.wanted import video_id_exist, video_path_exist, inject_video
 from app.secure.hash import generate_data_hash
 from app.resources import strings
 
+
 router = APIRouter(prefix = "/dl", tags = ["dl"])
-api_key_header = APIKeyHeader(name="Token")
 
 DBRegisterException = HTTP_Exception(
     status_code = status.HTTP_400_BAD_REQUEST,
     description=strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
     detail=strings.DB_DL_PROCESS_NOT_COMPLETED
 )
-
 InvalidIdException = HTTP_Exception(
     status_code = status.HTTP_404_NOT_FOUND,
     description = strings.DESCRIPTION_404_ERROR,
     detail = strings.ID_NOT_FOUND
 )
-
 VideoPathExistException = HTTP_Exception(
     status_code = status.HTTP_400_BAD_REQUEST,
     description = strings.DESCRIPTION_400_ERROR,
     detail = strings.VIDEO_PATH_ALREADY_EXIST
 )
-
 VideoPathNotExistException = HTTP_Exception(
     status_code = status.HTTP_400_BAD_REQUEST,
     description = strings.DESCRIPTION_400_ERROR,
     detail = strings.VIDEO_PATH_NOT_EXIST
 )
-
 DataFileNotFoundError = HTTP_Exception(
     status_code = status.HTTP_400_BAD_REQUEST,
     description = strings.DESCRIPTION_400_ERROR_FOR_DATA_FILE,
@@ -47,10 +42,11 @@ DataFileNotFoundError = HTTP_Exception(
 @router.post(
     path = "",
     response_model = VideoPathResponse,
-    responses = { **InvalidIdException.responses, 
-                 **VideoPathExistException.responses, 
-                 **DataFileNotFoundError.responses
-                 },
+    responses = { 
+        **InvalidIdException.responses, 
+        **VideoPathExistException.responses, 
+        **DataFileNotFoundError.responses
+    },
     status_code = status.HTTP_201_CREATED,
     name = "dl:register-video-path",
 )
@@ -67,7 +63,14 @@ async def register_video_path(
             DataFileNotFoundError.error_raise()
     else :
         video_request.video = ""
-    await inject_video_path(db_session, video_request)
+
+    try :
+        await inject_video_path(db_session, video_request)
+    except :
+        DBRegisterException.error_raise()
+    finally :
+        await db_session.close()
+
     await generate_data_hash( db_session )
     await db_session.close()
 
@@ -77,14 +80,16 @@ async def register_video_path(
         checksum = 'OK'
     )
 
+
 @router.put(
     path = "",
     response_model = VideoPathResponse,
-    responses = { **InvalidIdException.responses, 
-                 **VideoPathNotExistException.responses, 
-                 **DataFileNotFoundError.responses,
-                 **DBRegisterException.responses
-                 },
+    responses = { 
+        **InvalidIdException.responses, 
+        **VideoPathNotExistException.responses, 
+        **DataFileNotFoundError.responses,
+        **DBRegisterException.responses
+    },
     status_code = status.HTTP_201_CREATED,
     name = "dl:change-video-source",
 )
@@ -101,6 +106,7 @@ async def change_video_source(
             DataFileNotFoundError.error_raise()
     else :
         video_request.video = ""
+        
     try :
         await inject_video_path(db_session, video_request)
     except :
