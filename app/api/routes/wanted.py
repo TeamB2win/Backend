@@ -29,6 +29,7 @@ async def list_wanted_for_user(
 ) -> ListOfWantedDataResponse :
     data = await get_full_wanted_data(db_session)
     data_hash = calculate_hash( data )
+    await db_session.close()
     return ListOfWantedDataResponse(
         data_hash = data_hash,
         data = data
@@ -49,7 +50,7 @@ async def individual_wanted_for_user(
     if not data :
         raise HttpError404.error_raise()
     data_hash = get_data_hash()
-
+    await db_session.close()
     return WantedDataResponse(
         data_hash = data_hash,
         data = [ data ]
@@ -73,5 +74,5 @@ async def check_wanted_list(
         response.status = 'Expired'
     else :
         response.status = 'OK'
-
+    
     return response

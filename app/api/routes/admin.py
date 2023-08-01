@@ -57,7 +57,8 @@ DBRegisterException = HTTP_Exception(
     responses={
         **ImageWriteException.responses,
         **ImageOpenException.responses
-    }
+    },
+    name = "admin:upload-image",
 )
 async def upload_image(
     file: UploadFile
@@ -130,7 +131,7 @@ async def create_data(
         )
         print(dl_request)
         await request_dl_server( data = dl_request )
-
+        
         # DB 저장 
         await db_session.commit()
 
