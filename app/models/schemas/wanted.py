@@ -27,7 +27,7 @@ class VideoPathRequest(BaseSchemaModel) :
     video_source : Optional[str]
 
     is_err : Optional[bool] = Field(default = False)
-    err_msg : Optional[str]
+    err_msg : Optional[str] = None
 
 class VideoPathResponse(BaseSchemaModel) :
     id : int
