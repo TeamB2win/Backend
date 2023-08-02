@@ -7,20 +7,12 @@ from fastapi import File, UploadFile
 
 from app.models.schemas.base import BaseSchemaModel
 
-
-# 이미지 업로드 응답
-class UploadImageResponse(BaseSchemaModel):
-    image_path: str
-    status: str = Field(default="OK")
-
-
 # 범죄자 데이터 생성시 유저에게 요청사항
 class CreateWantedDataRequest(BaseSchemaModel):
     # essential
     wanted_id : int
     wanted_type : bool
     sex : bool
-    image : str
     
     # optional
     name : Optional[str] = None

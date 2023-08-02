@@ -1,12 +1,9 @@
 import os
-import io
 from datetime import datetime
 import secrets
-import json
 
-import asyncio
 import imageio
-from fastapi import APIRouter, Body, Depends, status, UploadFile
+from fastapi import APIRouter, Body, Depends, status, UploadFile, Form, File
 from sqlalchemy.ext.asyncio import AsyncSession
 import httpx
 
@@ -15,7 +12,7 @@ from app.db.queries.admin import create_wanted_data, delete_wanted_data
 from app.db.queries.wanted import get_wanted_data
 from app.db.repositories.wanted import Wanted, WantedDetail, WantedDataSource
 from app.models.schemas.admin import (
-    CreateVideoDataToDLRequest, UploadImageResponse, CreateWantedDataRequest,
+    CreateVideoDataToDLRequest, CreateWantedDataRequest,
     CreateWantedDataResponse, DeleteWantedRequest, DeleteWantedResponse
 )
 from app.secure.hash import generate_data_hash
@@ -59,64 +56,46 @@ DBProcessException = HTTP_Exception(
     detail = strings.DB_PROCESS_NOT_COMPLETED
 )
 
-# Image upload
-@router.post(
-    path="/uploadimage",
-    status_code=status.HTTP_201_CREATED,
-    response_model=UploadImageResponse,
-    responses={
-        **ImageWriteException.responses,
-        **ImageOpenException.responses
-    },
-    name = "admin:upload-image",
-)
-async def upload_image(
-    file: UploadFile
-) -> UploadImageResponse:
-    # get image name
-    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
-    image_path = os.path.join(os.environ["IMAGE_DIR"], ''.join([current_time, secrets.token_hex(16)]))
-    print(image_path)
-    try:
-        image_type = file.content_type.split('/')[-1]
-        image_path += f".{image_type}"
-        with open(image_path, 'wb+') as file_object:
-            file_object.write(file.file.read())
-    except:
-        print("Fail to Read the Image bytes")
-        ImageWriteException.error_raise( image_path = image_path )
-
-    # check to open Image by paths
-    try:
-        imageio.imread(image_path) 
-    except:
-        print("Fail to Open the Image using imageio")
-        ImageOpenException.error_raise( image_path = image_path )
-
-    return UploadImageResponse(
-        image_path=image_path,
-        status="OK"
-    )
-
 # 데이터 추가
 @router.post(
     path = "", 
     status_code=status.HTTP_201_CREATED,
     response_model=CreateWantedDataResponse,
     responses={
+        **ImageWriteException.responses,
+        **ImageOpenException.responses,
         **ImagePathException.responses,
         **DBRegisterException.responses
     },
     name = "admin:create-wanted-data",
 )
 async def create_wanted_data_api(
-    request : CreateWantedDataRequest = Body(..., embed=True),
+    file: UploadFile = File(...),
+    request : CreateWantedDataRequest = Depends(),
     db_session : AsyncSession = Depends(get_db),
 ) -> CreateWantedDataResponse:
     # Validate image path
-    if not os.path.exists(request.image):
-        print(f"Invalid Image path {request.image}")
-        ImagePathException.error_raise()
+
+    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+    image_path = os.path.join(os.environ["IMAGE_DIR"], ''.join([current_time, secrets.token_hex(16)]))
+
+    # image write check
+    try:
+        image_type = file.content_type.split('/')[-1]
+        image_path += f".{image_type}"
+        print(image_path)
+        with open(image_path, 'wb+') as file_object:
+            file_object.write(file.file.read())
+    except:
+        print("Fail to Read the Image bytes")
+        ImageWriteException.error_raise( image_path = image_path )
+    # imageio read check
+    try:
+        imageio.imread(image_path) 
+    except:
+        print("Fail to Open the Image using imageio")
+        ImageOpenException.error_raise( image_path = image_path )
+
     try:
         # Add to wanted Table in B2win DB  
         wanted_data : Wanted = Wanted.create(request=request)
@@ -127,7 +106,7 @@ async def create_wanted_data_api(
         wanted_detail_data : WantedDetail = await create_wanted_data(db=db_session, data_table=wanted_detail_data)
         print("insert data into wanted_detail")
 
-        wanted_datasource_data : WantedDataSource = WantedDataSource.create(image_path=request.image, id=wanted_data.id)
+        wanted_datasource_data : WantedDataSource = WantedDataSource.create(image_path=image_path, id=wanted_data.id)
         wanted_datasource_data : WantedDataSource = await create_wanted_data(db=db_session, data_table=wanted_datasource_data)
         print("insert data into wanted_datasource")
 
@@ -149,10 +128,8 @@ async def create_wanted_data_api(
         await db_session.rollback()
         DBRegisterException.error_raise( image_path = request.image )
     
-    finally :
-        await db_session.close()
-    
     data_hash: str = await generate_data_hash( db_session )
+    await db_session.close()
 
     return CreateWantedDataResponse(
         data_hash = data_hash,
