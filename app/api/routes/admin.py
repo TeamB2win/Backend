@@ -126,7 +126,7 @@ async def create_wanted_data_api(
 
     except:
         await db_session.rollback()
-        DBRegisterException.error_raise( image_path = request.image )
+        DBRegisterException.error_raise( image_path = image_path )
     
     data_hash: str = await generate_data_hash( db_session )
     await db_session.close()
