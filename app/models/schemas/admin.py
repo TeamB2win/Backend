@@ -28,13 +28,19 @@ class CreateWantedDataRequest(BaseSchemaModel):
     ended_at : Optional[datetime] = datetime.now()
      
 
-class CreateWantedDataResponse(BaseSchemaModel):
-    data_hash : str
+class CUDWantedDataResponse(BaseSchemaModel):
+    id : int
+    method : str
     status : str = Field(default = 'OK')
-
+    @validator('status')
+    @classmethod
+    def status_check(cls, v) :
+        assert v in ['OK', 'INVALID'], ValueError('Invaild Status')
+        return v
 
 # 범죄자 데이터 수정시 유저에게 요청
 class UpdateWantedDataRequest(BaseSchemaModel):
+    id : int
     wanted_id : int
     name : Optional[str]
     sex : bool
@@ -43,20 +49,18 @@ class UpdateWantedDataRequest(BaseSchemaModel):
 
     height : Optional[int]
     weight : Optional[str]
-    registered_address : Optional[str]
+    registered_address : Optional[str] = None
     residence : Optional[str]
     criminal : Optional[str]
-    relational_link : Optional[HttpUrl]
+    relational_link : Optional[str] = None
     characteristic : str
     started_at : datetime
     ended_at : datetime
     
-    image: str
 
 # 범죄자 비디오 데이터 DB에게 요청
-class UpdateWantedVideoDataRequest(BaseSchemaModel):
+class UpdateWantedMediaRequest(BaseSchemaModel):
     id : int
-    video_url: Optional[bytes]
 
 class CreateVideoDataToDLRequest(BaseSchemaModel) :
     id : int
@@ -69,13 +73,3 @@ class CreateVideoDataToDLRequest(BaseSchemaModel) :
 # 범죄자 데이터 삭제 요청 및 응답
 class DeleteWantedRequest(BaseSchemaModel) :
     id : int
-
-class DeleteWantedResponse(BaseSchemaModel) :
-    id : int
-    status : str = Field(default = 'OK')
-
-    @validator('status')
-    @classmethod
-    def status_check(cls, v) :
-        assert v in ['OK', 'INVALID'], ValueError('Invaild Status')
-        return v

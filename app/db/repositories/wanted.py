@@ -1,6 +1,6 @@
 from datetime import datetime
 from dataclasses import dataclass
-
+from typing import Optional
 from sqlalchemy import ForeignKey, Column
 from sqlalchemy import (
     TEXT, Integer, String,
@@ -8,7 +8,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from app.models.schemas.admin import CreateWantedDataRequest
+from app.models.schemas.admin import CreateWantedDataRequest, UpdateWantedDataRequest
 from app.db.repositories.base_class import Base
 
 @dataclass
@@ -28,15 +28,25 @@ class Wanted(Base):
     requester = relationship("Requester", back_populates="_wanted")
 
     @classmethod #orm 객체로 변환
-    def create(cls, request: CreateWantedDataRequest) -> "Wanted":
-        return cls(
+    def create(cls, request: CreateWantedDataRequest, id: Optional[int] = None) -> "Wanted":
+        return  cls(
             wanted_id = request.wanted_id,
             name = request.name,
             sex = request.sex,
             age = request.age,
             wanted_type = request.wanted_type
         )
-
+    
+    @classmethod
+    def convert_dict(cls, request: UpdateWantedDataRequest) :
+        return {
+            "id" : request.id,
+            "wanted_id" : request.wanted_id,
+            "name" : request.name,
+            "sex" : request.sex,
+            "age" : request.age,
+            "wanted_type" : request.wanted_type
+        }
 
 @dataclass
 class WantedDetail(Base):
@@ -55,7 +65,6 @@ class WantedDetail(Base):
 
     ## relationships
     _wanted = relationship("Wanted", back_populates="detail", uselist=False)
-
     
     @classmethod #orm 객체로 변환
     def create(cls, id, request: CreateWantedDataRequest) -> "WantedDetail":
@@ -72,6 +81,22 @@ class WantedDetail(Base):
             ended_at = request.ended_at.replace(tzinfo=None)
         )
     
+    @classmethod
+    def convert_dict(cls, request : UpdateWantedDataRequest) :
+        return {
+            "id" : request.id,
+            "height" : request.height,
+            "weight" : request.weight,
+            "registered_address" : request.registered_address,
+            "residence" : request.residence,
+            "criminal" : request.criminal,
+            "relational_link" : request.relational_link,
+            "characteristic" : request.characteristic,
+            "started_at" : request.started_at.replace(tzinfo=None),
+            "ended_at" : request.ended_at.replace(tzinfo=None)
+
+        }
+
 @dataclass
 class WantedDataSource(Base) :
     __tablename__ = "wanted_data_source"

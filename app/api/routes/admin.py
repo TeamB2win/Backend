@@ -8,12 +8,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import httpx
 
 from app.db.events import get_db
-from app.db.queries.admin import create_wanted_data, delete_wanted_data
+from app.db.queries.admin import (
+    create_wanted_data, delete_wanted_data, 
+    update_wanted_data, update_wanted_datasource
+)
 from app.db.queries.wanted import get_wanted_data
 from app.db.repositories.wanted import Wanted, WantedDetail, WantedDataSource
 from app.models.schemas.admin import (
-    CreateVideoDataToDLRequest, CreateWantedDataRequest,
-    CreateWantedDataResponse, DeleteWantedRequest, DeleteWantedResponse
+    CreateVideoDataToDLRequest, CreateWantedDataRequest, UpdateWantedDataRequest,
+    CUDWantedDataResponse, DeleteWantedRequest, UpdateWantedMediaRequest
 )
 from app.secure.hash import generate_data_hash
 from app.api.errors.http_errors import HTTP_Exception, image_remove
@@ -60,7 +63,7 @@ DBProcessException = HTTP_Exception(
 @router.post(
     path = "", 
     status_code=status.HTTP_201_CREATED,
-    response_model=CreateWantedDataResponse,
+    response_model=CUDWantedDataResponse,
     responses={
         **ImageWriteException.responses,
         **ImageOpenException.responses,
@@ -73,7 +76,7 @@ async def create_wanted_data_api(
     file: UploadFile = File(...),
     request : CreateWantedDataRequest = Depends(),
     db_session : AsyncSession = Depends(get_db),
-) -> CreateWantedDataResponse:
+) -> CUDWantedDataResponse:
     # Validate image path
 
     current_time = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -128,11 +131,12 @@ async def create_wanted_data_api(
         await db_session.rollback()
         DBRegisterException.error_raise( image_path = image_path )
     
-    data_hash: str = await generate_data_hash( db_session )
+    await generate_data_hash( db_session )
     await db_session.close()
 
-    return CreateWantedDataResponse(
-        data_hash = data_hash,
+    return CUDWantedDataResponse(
+        id = wanted_data.id,
+        method = 'Create',
         status = 'OK',
     )
 
@@ -148,7 +152,7 @@ async def request_dl_server(data):
 @router.delete(
     path = "",
     status_code = status.HTTP_202_ACCEPTED,
-    response_model = DeleteWantedResponse,
+    response_model = CUDWantedDataResponse,
     responses = {
         **InvaildIDException.responses,
         **DBProcessException.responses
@@ -158,7 +162,7 @@ async def request_dl_server(data):
 async def delete_wanted_data_api(
     request : DeleteWantedRequest = Body(..., embed = True),
     db_session : AsyncSession = Depends(get_db),    
-) -> DeleteWantedResponse:
+) -> CUDWantedDataResponse:
     data = await get_wanted_data( db = db_session, id = request.id )
     if data is None :
         raise InvaildIDException.error_raise()
@@ -170,12 +174,13 @@ async def delete_wanted_data_api(
     except :
         await db_session.rollback()
         raise DBProcessException.error_raise()
-    await generate_data_hash( db_session )
     await db_session.commit()
+    await generate_data_hash( db_session )
     await db_session.close()
     
-    return DeleteWantedResponse(
+    return CUDWantedDataResponse(
         id = request.id,
+        method = 'Delete',
         status = 'OK'
     )
 
@@ -185,15 +190,151 @@ async def delete_wanted_data_api(
 def update_data(
 '''
 
-# 데이터 삭제
-# @router.delete("/app/{criminal_id}", status_code=204)
-# def delete_data(
-#     criminal_id: int,
-#     db_session: AsyncSession = Depends(get_db),
-# ):
-#     criminal: CriminalData | None = search_criminal_data(session=session, criminal_id=criminal_id)
-#     if not criminal:
-#         raise HTTPException(status_code=404, detail="ToDo Not Found")
+@router.put(
+    path = "/data", 
+    status_code=status.HTTP_201_CREATED,
+    response_model=CUDWantedDataResponse,
+    responses={
+        **InvaildIDException.responses,
+        **DBRegisterException.responses
+    },
+    name = "admin:update-wanted-data",
+)
+async def update_wanted_data_api(
+    request : UpdateWantedDataRequest,
+    db_session : AsyncSession = Depends(get_db),
+) -> CUDWantedDataResponse:
+    # Validate image path
+    data = await get_wanted_data( db = db_session, id = request.id )
+    if data is None :
+        raise InvaildIDException.error_raise()
+    try:
+        # update to wanted Table in B2win DB
+        await update_wanted_data(db=db_session, table_type = 'wanted', request = request)
+        print("update data into wanted")
+        # update to wanted_detail Table in B2win DB  
+        await update_wanted_data(db=db_session, table_type = 'wanted_detail',request = request)
+        print("update data into wanted_detail")
+        # DB 저장 
+        await db_session.commit()
 
-#     delete_criminal_data(session=session, criminal_id=criminal_id)
+    except:
+        await db_session.rollback()
+        DBProcessException.error_raise()
+    
+    await generate_data_hash( db_session )
+    await db_session.close()
+
+    return CUDWantedDataResponse(
+        id = request.id,
+        method = 'Update',
+        status = 'OK',
+    )
+
+@router.put(
+    path = "/image", 
+    status_code=status.HTTP_201_CREATED,
+    response_model=CUDWantedDataResponse,
+    responses={
+        **ImageWriteException.responses,
+        **ImageOpenException.responses,
+        **ImagePathException.responses,
+        **InvaildIDException.responses,
+        **DBRegisterException.responses
+    },
+    name = "admin:update-wanted-image",
+)
+async def update_wanted_image_api(
+    file: UploadFile = File(...),
+    request : UpdateWantedMediaRequest = Depends(),
+    db_session : AsyncSession = Depends(get_db),
+) -> CUDWantedDataResponse:
+    
+    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+    image_path = os.path.join(os.environ["IMAGE_DIR"], ''.join([current_time, secrets.token_hex(16)]))
+    # Validate image path
+    # image write check
+    try:
+        image_type = file.content_type.split('/')[-1]
+        image_path += f".{image_type}"
+        print(image_path)
+        with open(image_path, 'wb+') as file_object:
+            file_object.write(file.file.read())
+    except:
+        print("Fail to Read the Image bytes")
+        ImageWriteException.error_raise( image_path = image_path )
+    # imageio read check
+    try:
+        imageio.imread(image_path) 
+    except:
+        print("Fail to Open the Image using imageio")
+        ImageOpenException.error_raise( image_path = image_path )
+
+    data : Wanted = await get_wanted_data( db = db_session, id = request.id )
+    if data is None :
+        raise InvaildIDException.error_raise()
+    
+    old_image_path = data.datasource[0].image
+    try:
+        # update to wanted Table in B2win DB
+        result = await update_wanted_datasource(db=db_session, id = request.id, image_path = image_path)
+        print("update image datasource")
+        # DB 저장 
+        dl_request = CreateVideoDataToDLRequest(
+            id = data.id,
+            image_path = image_path,
+            wanted_type = data.wanted_type,
+            prev_driving_path = None,
+            video_path = result.video
+        )
+        print(dl_request)
+        await request_dl_server( data = dl_request )
+        await db_session.commit()
+    except:
+        await db_session.rollback()
+        DBRegisterException.error_raise( image_path = image_path )
+    if os.path.exists(old_image_path) :
+        os.remove(old_image_path)
+    await generate_data_hash( db_session )
+    await db_session.close()
+
+    return CUDWantedDataResponse(
+        id = request.id,
+        method = 'Update',
+        status = 'OK',
+    )
+
+@router.put(
+    path = "/video", 
+    status_code=status.HTTP_201_CREATED,
+    response_model=CUDWantedDataResponse,
+    responses={
+        **InvaildIDException.responses
+    },
+    name = "admin:update-wanted-image",
+)
+async def update_wanted_video_api(
+    request : UpdateWantedMediaRequest,
+    db_session : AsyncSession = Depends(get_db),
+) -> CUDWantedDataResponse:
+
+    data : Wanted = await get_wanted_data( db = db_session, id = request.id )
+    if data is None :
+        raise InvaildIDException.error_raise()
+    
+    dl_request = CreateVideoDataToDLRequest(
+        id = data.id,
+        image_path = data.datasource[0].image,
+        wanted_type = data.wanted_type,
+        prev_driving_path = data.datasource[0].video,
+        video_path = data.datasource[0].driving_video
+    )
+    print(dl_request)
+    await request_dl_server( data = dl_request )
+
+    return CUDWantedDataResponse(
+        id = request.id,
+        method = 'Update',
+        status = 'OK',
+    )
 
