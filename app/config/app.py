@@ -11,7 +11,7 @@ class AppSettings() :
     max_connection_count : int = 20
     
     postgres_user: str = "postgres"
-    postgres_password: str = "answlqkd"
+    postgres_password: str = "1234"
     postgres_server: str = "63.35.31.27"
     postgres_port: str = "5432"
     postgres_db: str = "b2win"
