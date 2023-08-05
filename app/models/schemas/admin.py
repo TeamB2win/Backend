@@ -10,11 +10,11 @@ from app.models.schemas.base import BaseSchemaModel
 # 범죄자 데이터 생성시 유저에게 요청사항
 class CreateWantedDataRequest(BaseSchemaModel):
     # essential
-    wanted_id : int
     wanted_type : bool
-    sex : bool
     
     # optional
+    sex : Optional[bool] = None
+    wanted_id : Optional[int] = None
     name : Optional[str] = None
     age : Optional[int] = None
     height : Optional[int] = None
