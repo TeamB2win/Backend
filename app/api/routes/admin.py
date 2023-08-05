@@ -165,6 +165,7 @@ async def delete_wanted_data_api(
 ) -> CUDWantedDataResponse:
     data = await get_wanted_data( db = db_session, id = request.id )
     if data is None :
+        print("Can't find id from db")
         raise InvaildIDException.error_raise()
     try :
         data_sources = await delete_wanted_data( db = db_session, id = request.id )
@@ -173,6 +174,7 @@ async def delete_wanted_data_api(
                 os.remove(paths)
     except :
         await db_session.rollback()
+        print("Occur Error during delete data from db")
         raise DBProcessException.error_raise()
     await db_session.commit()
     await generate_data_hash( db_session )
