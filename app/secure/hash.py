@@ -40,8 +40,8 @@ def calculate_hash(
     data
 ) -> str:
     global wanted_data_hash
-
     wanted_data_hash = to_hash(to_str(data))
+    print(f"current_hash {wanted_data_hash}")
     return wanted_data_hash
     
 def get_data_hash() -> str :
