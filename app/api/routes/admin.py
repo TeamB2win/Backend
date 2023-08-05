@@ -3,7 +3,7 @@ from datetime import datetime
 import secrets
 
 import imageio
-from fastapi import APIRouter, Body, Depends, status, UploadFile, Form, File
+from fastapi import APIRouter, Depends, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 import httpx
 
@@ -160,7 +160,7 @@ async def request_dl_server(data):
     name = "admin:delete-wanted-by-id"
 )
 async def delete_wanted_data_api(
-    request : DeleteWantedRequest = Body(..., embed = True),
+    request : DeleteWantedRequest,
     db_session : AsyncSession = Depends(get_db),    
 ) -> CUDWantedDataResponse:
     data = await get_wanted_data( db = db_session, id = request.id )
