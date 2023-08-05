@@ -11,7 +11,6 @@ def to_hash(
     data
 ) -> dict:
     hash_object = hashlib.sha256(data.encode('utf-8'))
-
     return hash_object.hexdigest()
 
 def to_str(
@@ -41,7 +40,6 @@ def calculate_hash(
 ) -> str:
     global wanted_data_hash
     wanted_data_hash = to_hash(to_str(data))
-    print(f"current_hash {wanted_data_hash}")
     return wanted_data_hash
     
 def get_data_hash() -> str :
@@ -50,7 +48,6 @@ def get_data_hash() -> str :
 def compare_data_hash(
     required_data_hash : str,
 ) -> bool :
-    print(wanted_data_hash)
     return required_data_hash==wanted_data_hash
 
 async def generate_data_hash(
