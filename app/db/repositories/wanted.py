@@ -17,10 +17,10 @@ class Wanted(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     wanted_id = Column(Integer, nullable=True)
+    wanted_type = Column(Boolean, nullable=False) # True : urgent case
     name = Column(TEXT, nullable=True)
     sex = Column(Boolean, nullable=True) # True : Female, False : Male
     age = Column(REAL, nullable=True)
-    wanted_type = Column(Boolean, nullable=False, default=False) # True : urgent case
 
     ## relationships
     detail = relationship("WantedDetail", back_populates="_wanted")
