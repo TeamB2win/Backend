@@ -12,7 +12,6 @@ class ListOfWantedDataResponse(BaseSchemaModel) :
     data : List[WantedFullData]
 
 class CheckHashResponse(BaseSchemaModel) :
-    data_hash : str
     status : str = Field(default = 'OK')
 
     @validator('status')
