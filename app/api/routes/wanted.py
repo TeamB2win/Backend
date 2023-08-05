@@ -66,9 +66,7 @@ async def check_wanted_list(
     data_hash : str = Path(title="The data hash of all wanted data to validate"),
 ) -> CheckHashResponse :
     response = CheckHashResponse()
-    print(f"request data hash: {data_hash}")
     if not compare_data_hash(required_data_hash=data_hash):
-        print("Expired data_hash")
         response.status = 'Expired'
     
     return response

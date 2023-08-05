@@ -1,6 +1,6 @@
 import os
 
-from fastapi import APIRouter, Depends, status, Body
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.errors.http_errors import HTTP_Exception, image_remove
