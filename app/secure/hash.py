@@ -50,6 +50,7 @@ def get_data_hash() -> str :
 def compare_data_hash(
     required_data_hash : str,
 ) -> bool :
+    print(wanted_data_hash)
     return required_data_hash==wanted_data_hash
 
 async def generate_data_hash(
