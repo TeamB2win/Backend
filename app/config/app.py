@@ -12,7 +12,7 @@ class AppSettings() :
     
     postgres_user: str = "postgres"
     postgres_password: str = "1234"
-    postgres_server: str = "63.35.31.27"
+    postgres_server: str = "172.17.0.1"
     postgres_port: str = "5432"
     postgres_db: str = "b2win"
     db_echo_log: bool = True
