@@ -1,9 +1,9 @@
-from typing import Optional, List, Any
+from typing import List, Any
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.schemas.admin import UpdateWantedDataRequest, UpdateWantedMediaRequest
+from app.models.schemas.admin import UpdateWantedDataRequest
 from app.db.repositories.wanted import Wanted, WantedDataSource, WantedDetail
 from app.db.repositories.base_class import Base
 

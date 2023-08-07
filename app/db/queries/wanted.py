@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from sqlalchemy.orm import joinedload
 
-from app.db.repositories.wanted import Wanted, WantedDataSource, WantedDetail
+from app.db.repositories.wanted import Wanted, WantedDataSource
 from app.models.schemas.wanted import VideoPathRequest
 
 
