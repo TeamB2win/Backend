@@ -4,12 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.errors.http_errors import HTTP_Exception
 from app.db.events import get_db
 from app.db.queries.wanted import get_full_wanted_data, get_wanted_data
-from app.secure.hash import calculate_hash, get_data_hash, compare_data_hash
-
 from app.models.schemas.wanted import (
     ListOfWantedDataResponse, WantedDataResponse, CheckHashResponse
 )
 from app.resources import strings
+from app.secure.hash import calculate_hash, get_data_hash, compare_data_hash
 
 router = APIRouter(prefix = "/wanted", tags = ["wanted"])
 HttpError404 = HTTP_Exception(

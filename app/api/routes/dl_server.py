@@ -3,12 +3,12 @@ import os
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.errors.http_errors import HTTP_Exception, image_remove
-from app.models.schemas.wanted import VideoPathRequest, VideoPathResponse
+from app.api.errors.http_errors import HTTP_Exception
 from app.db.events import get_db
 from app.db.queries.wanted import video_id_exist, video_path_exist, inject_video_path
-from app.secure.hash import generate_data_hash
+from app.models.schemas.wanted import VideoPathRequest, VideoPathResponse
 from app.resources import strings
+from app.secure.hash import generate_data_hash
 
 
 router = APIRouter(prefix = "/dl", tags = ["dl"])

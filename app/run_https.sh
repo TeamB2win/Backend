@@ -1,13 +1,8 @@
-#!/bin/sh
-
-# export APP_MODULE=${APP_MODULE-src.main:app}
-# export HOST=${HOST:-0.0.0.0}
-# export PORT=${PORT:-8001}
 export PYTHONPATH="$(cd .. && pwd)"
-# export IMAGE_DIR="/workspace/data/image"
+
 export IMAGE_DIR="/workspace/data/image"
-export DL_URL="http://63.35.31.27:8080"
-export FRONT_URL="http://63.35.31.27:3000"
+export DL_URL="http://172.17.0.1:8080"
+export FRONT_URL="http://172.17.0.1:3000"
 APP_MODULE="main:app"
 HOST="0.0.0.0"
 PORT="8000"

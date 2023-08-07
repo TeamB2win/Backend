@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, Column
-from sqlalchemy import Integer, VARCHAR, Sequence, TIMESTAMP
-
+from sqlalchemy import Integer, VARCHAR, TIMESTAMP
 from sqlalchemy.orm import relationship
+
 from app.db.repositories.base_class import Base
 
 class Admin(Base):

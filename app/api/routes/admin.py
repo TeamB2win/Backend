@@ -2,26 +2,25 @@ import os
 from datetime import datetime
 import secrets
 
-import imageio
 from fastapi import APIRouter, Depends, status, UploadFile, File
+import imageio
 from sqlalchemy.ext.asyncio import AsyncSession
-import httpx
 
+from app.api.errors.http_errors import HTTP_Exception, image_remove
+from app.api.routes.requester import request_dl_server
 from app.db.events import get_db
+from app.db.repositories.wanted import Wanted, WantedDetail, WantedDataSource
 from app.db.queries.admin import (
     create_wanted_data, delete_wanted_data, 
     update_wanted_data, update_wanted_datasource
 )
 from app.db.queries.wanted import get_wanted_data
-from app.db.repositories.wanted import Wanted, WantedDetail, WantedDataSource
 from app.models.schemas.admin import (
     CreateVideoDataToDLRequest, CreateWantedDataRequest, UpdateWantedDataRequest,
     CUDWantedDataResponse, DeleteWantedRequest, UpdateWantedMediaRequest
 )
-from app.secure.hash import generate_data_hash
-from app.api.errors.http_errors import HTTP_Exception, image_remove
 from app.resources import strings
-
+from app.secure.hash import generate_data_hash
 
 router = APIRouter(prefix = "/admin", tags = ["admin"])
 
@@ -140,14 +139,7 @@ async def create_wanted_data_api(
         status = 'OK',
     )
 
-async def request_dl_server(data):
-    url = os.path.join(os.environ["DL_URL"], "api", "inference")
-    print(url)
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, data=data.json())
-        print(response)
 
-    return response
 
 @router.delete(
     path = "",
@@ -183,12 +175,6 @@ async def delete_wanted_data_api(
         method = 'Delete',
         status = 'OK'
     )
-
-'''
-# 데이터 수정
-@router.patch("/app/{criminal_id}", status_code=200)
-def update_data(
-'''
 
 @router.put(
     path = "/data", 
@@ -311,7 +297,7 @@ async def update_wanted_image_api(
     responses={
         **InvaildIDException.responses
     },
-    name = "admin:update-wanted-image",
+    name = "admin:update-wanted-video",
 )
 async def update_wanted_video_api(
     request : UpdateWantedMediaRequest,

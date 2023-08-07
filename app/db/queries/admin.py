@@ -2,10 +2,10 @@ from typing import Optional, List, Any
 
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.repositories.base_class import Base
 
 from app.models.schemas.admin import UpdateWantedDataRequest, UpdateWantedMediaRequest
 from app.db.repositories.wanted import Wanted, WantedDataSource, WantedDetail
+from app.db.repositories.base_class import Base
 
 table_dict = {
     'wanted' : Wanted,

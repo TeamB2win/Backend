@@ -1,7 +1,5 @@
-from typing import Optional, List, Union
 from datetime import datetime
-from fastapi import File
-from pydantic import HttpUrl, Field
+from typing import Optional, List
 
 from app.models.domain.base import BaseDomainModel
 
