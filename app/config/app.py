@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 from typing import List
 
@@ -9,6 +10,8 @@ class AppSettings() :
 
     min_connection_count : int = 10
     max_connection_count : int = 20
+    docs_url : str = "/docs" if os.environ("DOCS_ENABLE") else None
+    redoc_url : str = "/redoc" if os.environ("DOCS_ENABLE") else None
     
     postgres_user: str = "postgres"
     postgres_password: str = "1234"

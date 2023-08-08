@@ -10,7 +10,7 @@ settings = get_app_settings()
 def get_application() -> FastAPI:
     global settings
     # initialize FastAPI and settings
-    application = FastAPI()
+    application = FastAPI(docs_url = settings.docs_url, redoc_url = settings.redoc_url)
     
     # setting midware for cross-domain situation (react.js, For example)
 
