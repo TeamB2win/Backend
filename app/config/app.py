@@ -1,4 +1,5 @@
 import os
+from distutils.util import strtobool
 from functools import lru_cache
 from typing import List
 
@@ -10,8 +11,8 @@ class AppSettings() :
 
     min_connection_count : int = 10
     max_connection_count : int = 20
-    docs_url : str = "/docs" if os.environ["DOCS_ENABLE"] else None
-    redoc_url : str = "/redoc" if os.environ["DOCS_ENABLE"] else None
+    docs_url : str = "/docs" if strtobool(os.environ["DOCS_ENABLE"]) else None
+    redoc_url : str = "/redoc" if strtobool(os.environ["DOCS_ENABLE"]) else None
     
     postgres_user: str = "postgres"
     postgres_password: str = "1234"
