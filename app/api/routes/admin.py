@@ -312,8 +312,8 @@ async def update_wanted_video_api(
         id = data.id,
         image_path = data.datasource[0].image,
         wanted_type = data.wanted_type,
-        prev_driving_path = data.datasource[0].video,
-        video_path = data.datasource[0].driving_video
+        prev_driving_path = data.datasource[0].driving_video,
+        video_path = data.datasource[0].video
     )
     print(dl_request)
     await request_dl_server( data = dl_request )
