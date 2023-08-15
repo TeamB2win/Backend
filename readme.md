@@ -1,3 +1,5 @@
+<img src="src/passerby_service.gif"/>
+
 # 🕵🏻 Passerby-Backend
 
 ### <div align="center"><b><i> Passerby, 여러분의 안전을 책임집니다. </i></b></div>
@@ -29,7 +31,14 @@
 
 # ❓ About B2win Team
 
+<div align="center">
+  
+| [@hwaxrang](https://github.com/hwaxrang) | [@Magenta195](https://github.com/Magenta195) | [@moongni](https://github.com/moongni) | [@heehaaaheeeee](https://github.com/heehaaaheeeee) | [@ShinEunChae](https://github.com/ShinEunChae) | [@joseokjun](https://github.com/joseokjun) |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| <img src="src/khr.png" width=200 /> | <img src="src/kth.jpeg" width=200 /> | <img src="src/mgh.png" width=200 /> | <img src="src/msh.jpg" width=200 /> | <img src="src/sec.jpeg" width=200 /> | <img src="src/jsj.jpg" width=200 /> |
+| `권화랑`   | `김태형` | `문건희` | `문숙희` | `신은채` | `조석준`  |
 
+</div>
 
 👉 Notion : [링크](https://www.notion.so/B2Win-Between-a9b09623b67243319d9bbce293bfa46b)
 
