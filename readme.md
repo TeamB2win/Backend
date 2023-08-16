@@ -40,7 +40,10 @@
 
 </div>
 
-👉 Notion : [링크](https://www.notion.so/B2Win-Between-a9b09623b67243319d9bbce293bfa46b)
+<div align="center">
+<a href = "https://github.com/TeamB2win"><img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/></a>
+<a href = "https://www.notion.so/B2Win-Between-a9b09623b67243319d9bbce293bfa46b?pvs=4"><img alt="Notion" src ="https://img.shields.io/badge/Notion-eeeeee.svg?&style=for-the-badge&logo=Notion&logoColor=black"/></a>
+</div>
 
 
 
