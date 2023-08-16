@@ -168,7 +168,7 @@ pip install -r requirements.txt
 
 ### http로 실행하기
 
-다음 명령어를 실행해 주세요.
+명령어를 통해 `/app` 디렉토리로 이동한 후, 다음 명령어를 실행해 주세요.
 
 ```bash
 sh run.sh
